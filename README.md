@@ -28,4 +28,4 @@ MSScrollView *scrollView = [[MSScrollView alloc] initWithFrame:frame
 - (void)MSScrollViewDidScroll:(UIScrollView *)scrollView;
 
 
-![image](https://github.com/yuanshuainiuniu/AdvertisingScrollView/blob/master/shot.png)
+![image] (https://github.com/yuanshuainiuniu/AdvertisingScrollView/blob/master/shot.png)
