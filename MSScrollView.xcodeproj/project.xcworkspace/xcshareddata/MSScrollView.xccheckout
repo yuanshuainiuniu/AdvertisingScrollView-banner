@@ -6,15 +6,19 @@
 	<false/>
 	<key>IDESourceControlProjectIdentifier</key>
 	<string>71B9685E-754C-46AC-A798-C6FFE79FCF95</string>
+	<key>IDESourceControlProjectName</key>
+	<string>MSScrollView</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
 		<key>23849625F24245AD8C9EE273CB316C55945FD386</key>
 		<string>https://github.com/yuanshuainiuniu/AdvertisingScrollView.git</string>
 	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>MSScrollView.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>23849625F24245AD8C9EE273CB316C55945FD386</key>
-		<string>AdvertisingScrollView/</string>
+		<string>../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
 	<string>https://github.com/yuanshuainiuniu/AdvertisingScrollView.git</string>
