@@ -29,3 +29,4 @@ MSScrollView *scrollView = [[MSScrollView alloc] initWithFrame:frame
 
 
 ![image](https://github.com/yuanshuainiuniu/AdvertisingScrollView/blob/master/shot.png)
+![image](https://github.com/yuanshuainiuniu/MSTableViewCell/blob/master/shot.png)
