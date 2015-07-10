@@ -58,12 +58,10 @@
 #pragma markPrivate methods
 /* 设置图片 */
 - (void)initImages:(NSArray *)images{
-    _images = [NSMutableArray array];
-    [_images addObject:[images lastObject]];
+    _images = [NSMutableArray arrayWithCapacity:images.count];
     for (NSString *imageName in images) {
-        [_images addObject:imageName];
+        [_images addObject:[UIImage imageNamed:imageName]];
     }
-    [_images addObject:[images firstObject]];
 }
 - (void)addScrollView{
     _scrollView                                = [[UIScrollView alloc] initWithFrame:self.bounds];
@@ -98,7 +96,6 @@
         [self.delegate MSScrollView:self didSelectPage:_pageControl.currentPage];
     }
 }
-
 
 /**
  *  添加pagcontrol
@@ -159,10 +156,6 @@
             }
         }
     }
-    
-
-    
-    
     [self reloadData];
 }
 -(void)scrollViewWillBeginDragging:(UIScrollView *)scrollView{
@@ -190,29 +183,25 @@
 
 -(void)reloadData
 {
-    [self.firstImageView removeFromSuperview];
-    [self.secondImageView removeFromSuperview];
-    [self.threeImageView removeFromSuperview];
-    
     if (_currentPage==0) {
         NSLog(@"----第一页");
-        self.firstImageView.image = [UIImage imageNamed:[self.images lastObject]];
-        self.secondImageView.image = [UIImage imageNamed:self.images[_currentPage]];
-        self.threeImageView.image = [UIImage imageNamed:self.images[_currentPage+1]];
+        self.firstImageView.image = [self.images lastObject];
+        self.secondImageView.image = self.images[_currentPage];
+        self.threeImageView.image = self.images[_currentPage+1];
     }
     else if (_currentPage == self.images.count-1)
     {
         NSLog(@"----最后一页");
-        self.firstImageView.image = [UIImage imageNamed:self.images[_currentPage-1]];
-        self.secondImageView.image = [UIImage imageNamed:self.images[_currentPage]];
-        self.threeImageView.image = [UIImage imageNamed:[self.images firstObject]];
+        self.firstImageView.image = self.images[_currentPage-1];
+        self.secondImageView.image = self.images[_currentPage];
+        self.threeImageView.image = [self.images firstObject];
     }
     else
     {
         NSLog(@"----");
-        self.firstImageView.image = [UIImage imageNamed:self.images[_currentPage-1]];
-        self.secondImageView.image = [UIImage imageNamed:self.images[_currentPage]];
-        self.threeImageView.image = [UIImage imageNamed:self.images[_currentPage+1]];
+        self.firstImageView.image = self.images[_currentPage-1];
+        self.secondImageView.image = self.images[_currentPage];
+        self.threeImageView.image = self.images[_currentPage+1];
     }
     
     CGFloat width = self.frame.size.width;

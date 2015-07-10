@@ -21,7 +21,7 @@
     MSScrollView *scrollView = [[MSScrollView alloc] initWithFrame:self.view.frame
                                                             images:array
                                                           delegate:self
-                                                         direction:MSCycleDirectionVertical
+                                                         direction:MSCycleDirectionHorizontal
                                                           autoPlay:NO
                                                              delay:2.0];
     [self.view addSubview:scrollView];
