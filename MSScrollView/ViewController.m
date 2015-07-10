@@ -17,13 +17,13 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    NSArray *array = @[@"img_index_01bg",@"img_index_02bg",@"img_index_03bg"];
+    NSArray *array = @[@"img_index_01bg",@"img_index_02bg",@"img_index_03bg",@"img_index_03bg",@"img_index_03bg"];
     MSScrollView *scrollView = [[MSScrollView alloc] initWithFrame:self.view.frame
                                                             images:array
                                                           delegate:self
-                                                         direction:MSCycleDirectionHorizontal
-                                                          autoPlay:YES
-                                                             delay:4.0];
+                                                         direction:MSCycleDirectionVertical
+                                                          autoPlay:NO
+                                                             delay:2.0];
     [self.view addSubview:scrollView];
 }
 #pragma mark-
