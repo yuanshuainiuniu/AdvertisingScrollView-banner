@@ -1,7 +1,7 @@
 # AdvertisingScrollView
 ![image](https://github.com/yuanshuainiuniu/AdvertisingScrollView/blob/master/shot.png)
 
-
+做了一些优化,用3个imageView复用创建,支持横屏和竖屏播放
 a AdvertisingScrollView,can scroll auto,or by yourself.
 Drag`MSScrollView.h` `MSScrollView.m` to your project<br>
 init：
