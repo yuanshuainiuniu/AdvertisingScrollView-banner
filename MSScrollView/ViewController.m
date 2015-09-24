@@ -18,13 +18,24 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     NSArray *array = @[@"img_index_01bg",@"img_index_02bg",@"img_index_03bg",@"img_index_03bg",@"img_index_03bg"];
-    MSScrollView *scrollView = [[MSScrollView alloc] initWithFrame:self.view.frame
-                                                            images:array
-                                                          delegate:self
-                                                         direction:MSCycleDirectionHorizontal
-                                                          autoPlay:NO
-                                                             delay:2.0];
-    [self.view addSubview:scrollView];
+    MSScrollView *scr = [[MSScrollView alloc] init];
+    scr.delegate = self;
+    scr.frame = CGRectMake(0, 0, self.view.frame.size.width, 200);
+    [self.view addSubview:scr];
+    scr.autoPlay = NO;
+    scr.timeInterval = 5;
+    scr.images = [NSMutableArray arrayWithArray:array];
+    
+//    MSScrollView *scrollView = [[MSScrollView alloc] initWithFrame:self.view.frame
+//                                                            images:array
+//                                                          delegate:self
+//                                                         direction:MSCycleDirectionHorizontal
+//                                                          autoPlay:YES
+//                                                             delay:2.0];
+//    [self.view addSubview:scrollView];
+//   
+    
+   
 }
 #pragma mark-
 #pragma mark- MSScrollView Delegate
@@ -32,12 +43,7 @@
     NSLog(@"%ld",(long)index);
 }
 - (void)MSScrollViewDidScroll:(UIScrollView *)scrollView{
-    NSLog(@"%f",scrollView.contentOffset.y);
-}
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+    NSLog(@"contentOffset=%f",scrollView.contentOffset.x);
 }
 
 @end

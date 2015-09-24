@@ -42,19 +42,59 @@
 - (id)initWithFrame:(CGRect)frame images:(NSArray *)images delegate:(id<MSScrollViewDelegate>)delegate direction:(MSCycleDirection)direction autoPlay:(BOOL)autoPlay delay:(CGFloat)timeInterval{
     if (self      = [super initWithFrame:frame]) {
     _direction    = direction;
-    _isAutoPlay   = autoPlay;
+    _autoPlay   = autoPlay;
     _timeInterval = timeInterval;
     _delegate     = delegate;
-    _currentPage = 0;
-        [self initImages:images];
-        [self addScrollView];
-        [self addPageControl];
-        [self reloadData];
-
+    [self initImages:images];
+    [self commoninit];
     }
     return self;
 }
-#pragma mark- 
+- (id)initWithFrame:(CGRect)frame imageUrls:(NSArray *)imageUrls delegate:(id<MSScrollViewDelegate>)delegate direction:(MSCycleDirection)direction autoPlay:(BOOL)autoPlay delay:(CGFloat)timeInterval{
+    if (self      = [super initWithFrame:frame]) {
+        _direction    = direction;
+        _autoPlay   = autoPlay;
+        _timeInterval = timeInterval;
+        _delegate     = delegate;
+        [self initImages:imageUrls];
+        [self commoninit];
+    }
+    return self;
+}
+- (instancetype)initWithFrame:(CGRect)frame{
+    if (self = [super initWithFrame:frame]) {
+        [self commoninit];
+    }
+    return self;
+}
+- (void)commoninit{
+    _currentPage = 0;
+    [self addScrollView];
+    [self addPageControl];
+    [self reloadData];
+}
+- (void)setTimeInterval:(CGFloat)timeInterval{
+    _timeInterval = timeInterval;
+    [self commoninit];
+}
+- (void)setDirection:(MSCycleDirection)direction{
+    _direction = direction;
+    [self commoninit];
+}
+- (void)setAutoPlay:(BOOL)autoPlay{
+    _autoPlay = autoPlay;
+    [self commoninit];
+}
+- (void)setImages:(NSMutableArray *)images{
+    NSMutableArray *tempArr = [NSMutableArray arrayWithCapacity:images.count];
+    [images enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        UIImage *image = [UIImage imageNamed:(NSString *)obj];
+        [tempArr addObject:image];
+    }];
+    _images = [tempArr copy];
+    [self commoninit];
+}
+#pragma mark-
 #pragma markPrivate methods
 /* 设置图片 */
 - (void)initImages:(NSArray *)images{
@@ -63,29 +103,37 @@
         [_images addObject:[UIImage imageNamed:imageName]];
     }
 }
+static UITapGestureRecognizer *tapGestureRecognizer;
 - (void)addScrollView{
-    _scrollView                                = [[UIScrollView alloc] initWithFrame:self.bounds];
+    if (_scrollView == nil) {
+        _scrollView                                = [[UIScrollView alloc] init];
+        _scrollView.backgroundColor = [UIColor blackColor];
+        _scrollView.delegate                       = self;
+        _scrollView.pagingEnabled                  = YES;
+        _scrollView.showsHorizontalScrollIndicator = NO;
+        _scrollView.showsVerticalScrollIndicator   = NO;
+        _scrollView.scrollsToTop                   = NO;
+        _scrollView.bounces = NO;
+    }
+    _scrollView.frame = self.bounds;
     if (self.direction == MSCycleDirectionHorizontal) {
         _scrollView.contentSize = CGSizeMake(self.frame.size.width * 3, self.frame.size.height);
     }else{
         _scrollView.contentSize = CGSizeMake(self.frame.size.width, self.frame.size.height * 3);
     }
-    _scrollView.backgroundColor = [UIColor blackColor];
-    _scrollView.delegate                       = self;
-    _scrollView.pagingEnabled                  = YES;
-    _scrollView.showsHorizontalScrollIndicator = NO;
-    _scrollView.showsVerticalScrollIndicator   = NO;
-    _scrollView.scrollsToTop                   = NO;
-    _scrollView.bounces = NO;
-    
-    UITapGestureRecognizer *tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(singleTapGestureRecognizer:)];
-    tapGestureRecognizer.numberOfTapsRequired    = 1;
-    tapGestureRecognizer.delegate                = self;
+   
+    if (tapGestureRecognizer == nil) {
+        tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(singleTapGestureRecognizer:)];
+        tapGestureRecognizer.numberOfTapsRequired    = 1;
+        tapGestureRecognizer.delegate                = self;
+    }
     [_scrollView addGestureRecognizer:tapGestureRecognizer];
 
     [self addSubview:_scrollView];
-    if (_isAutoPlay) {
+    if (self.isAutoPlay) {
         [self addTimer];
+    }else{
+        [self removeTimer];
     }
     
 }
@@ -101,11 +149,15 @@
  *  添加pagcontrol
  */
 - (void)addPageControl{
-    _pageControl                               = [[UIPageControl alloc] initWithFrame:CGRectMake(0, self.frame.size.height - kPageHeight, self.frame.size.width, kPageHeight)];
-    _pageControl.numberOfPages                 = self.images.count;
-    _pageControl.pageIndicatorTintColor        = [UIColor whiteColor];
-    _pageControl.currentPageIndicatorTintColor = [UIColor purpleColor];
-    _pageControl.userInteractionEnabled        = NO;
+    if (_pageControl == nil) {
+        _pageControl                               = [[UIPageControl alloc] init];
+        _pageControl.pageIndicatorTintColor        = [UIColor whiteColor];
+        _pageControl.currentPageIndicatorTintColor = [UIColor purpleColor];
+        _pageControl.userInteractionEnabled        = NO;
+    }
+   _pageControl.frame = CGRectMake(0, self.frame.size.height - kPageHeight, self.frame.size.width, kPageHeight);
+    _pageControl.numberOfPages                 = _images.count;
+    
     [self addSubview:_pageControl];
 }
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView{
@@ -122,7 +174,7 @@
         //往前翻
         if (x<=0 ) {
             if (_currentPage-1<0) {
-                _currentPage = (int)self.images.count-1;
+                _currentPage = (int)_images.count-1;
             }else{
                 _currentPage --;
             }
@@ -130,7 +182,7 @@
         
         //往后翻
         if (x>=self.frame.size.width*2 ) {
-            if (_currentPage==self.images.count-1) {
+            if (_currentPage==_images.count-1) {
                 _currentPage = 0;
             }else{
                 _currentPage ++;
@@ -141,7 +193,7 @@
         //up
         if (y>self.frame.size.height ) {
             
-            if (_currentPage==self.images.count-1) {
+            if (_currentPage==_images.count-1) {
                 _currentPage = 0;
             }else{
                 _currentPage ++;
@@ -150,7 +202,7 @@
         //down
         if (y<self.frame.size.height) {
             if (_currentPage-1<0) {
-                _currentPage = (int)self.images.count-1;
+                _currentPage = (int)_images.count-1;
             }else{
                 _currentPage --;
             }
@@ -162,20 +214,23 @@
     [self removeTimer];
 }
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate{
-    if (_isAutoPlay) {
+    if (self.isAutoPlay) {
         [self addTimer];
     }
 }
 - (void)addTimer{
     [self removeTimer];
-    self.AutoTimer = [NSTimer scheduledTimerWithTimeInterval:self.timeInterval target:self selector:@selector(autoShowNextImage) userInfo:nil repeats:YES];
+    self.AutoTimer = [NSTimer scheduledTimerWithTimeInterval:(_timeInterval>0?_timeInterval:2.5) target:self selector:@selector(autoShowNextImage) userInfo:nil repeats:YES];
 
     [[NSRunLoop mainRunLoop] addTimer:self.AutoTimer forMode:NSRunLoopCommonModes];
 
 }
 - (void)removeTimer{
-    [self.AutoTimer invalidate];
-    self.AutoTimer = nil;
+    
+    if (_AutoTimer != nil) {
+        [_AutoTimer invalidate];
+        _AutoTimer = nil;
+    }
 }
 -(void)dealloc{
     [self removeTimer];
@@ -183,25 +238,25 @@
 
 -(void)reloadData
 {
-    if (_currentPage==0) {
-        NSLog(@"----第一页");
-        self.firstImageView.image = [self.images lastObject];
-        self.secondImageView.image = self.images[_currentPage];
-        self.threeImageView.image = self.images[_currentPage+1];
+    if (_images.count<3) {
+        return;
     }
-    else if (_currentPage == self.images.count-1)
+    if (_currentPage==0) {
+        self.firstImageView.image = [_images lastObject];
+        self.secondImageView.image =_images[_currentPage];
+        self.threeImageView.image = _images[_currentPage+1];
+    }
+    else if (_currentPage == _images.count-1)
     {
-        NSLog(@"----最后一页");
-        self.firstImageView.image = self.images[_currentPage-1];
-        self.secondImageView.image = self.images[_currentPage];
-        self.threeImageView.image = [self.images firstObject];
+        self.firstImageView.image = _images[_currentPage-1];
+        self.secondImageView.image = _images[_currentPage];
+        self.threeImageView.image = [_images firstObject];
     }
     else
     {
-        NSLog(@"----");
-        self.firstImageView.image = self.images[_currentPage-1];
-        self.secondImageView.image = self.images[_currentPage];
-        self.threeImageView.image = self.images[_currentPage+1];
+        self.firstImageView.image = _images[_currentPage-1];
+        self.secondImageView.image = _images[_currentPage];
+        self.threeImageView.image = _images[_currentPage+1];
     }
     
     CGFloat width = self.frame.size.width;
@@ -211,32 +266,47 @@
     [_scrollView addSubview:self.secondImageView];
     [_scrollView addSubview:self.threeImageView];
     
-    _pageControl.currentPage = _currentPage;
     
+    _pageControl.currentPage = _currentPage;
     if(self.direction == MSCycleDirectionHorizontal){
         self.firstImageView.frame = self.frame;
         self.secondImageView.frame = CGRectMake(width, 0, width, height);
         self.threeImageView.frame = CGRectMake(width*2, 0, width, height);
         _scrollView.contentOffset = CGPointMake(width, 0);
+        
     }else{
         self.firstImageView.frame = self.frame;
         self.secondImageView.frame = CGRectMake(0, height, width, height);
         self.threeImageView.frame = CGRectMake(0, height*2, width, height);
         _scrollView.contentOffset = CGPointMake(0, height);
     }
+    
+    
 }
-
-
 #pragma mark 展示下一页
 -(void)autoShowNextImage
 {
-    if (_currentPage == self.images.count-1) {
+    if (_currentPage == _images.count-1) {
         _currentPage = 0;
     }else{
         _currentPage ++;
     }
+    [UIView animateWithDuration:.3 animations:^{
+        
+        if (self.direction == MSCycleDirectionHorizontal) {
+            _scrollView.contentOffset = CGPointMake(self.frame.size.width*2, 0);
+
+        }else{
+            _scrollView.contentOffset = CGPointMake(0, self.frame.size.height*2);
+        }
+    } completion:^(BOOL finished) {
+        [self reloadData];
+    }];
     
-    [self reloadData];
+}
+- (void)layoutSubviews{
+    [super layoutSubviews];
+    [self commoninit];
 }
 
 @end

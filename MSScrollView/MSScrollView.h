@@ -10,8 +10,8 @@
 #import <UIKit/UIKit.h>
 @class MSScrollView;
 typedef enum{
-    MSCycleDirectionVertical,
-    MSCycleDirectionHorizontal
+    MSCycleDirectionHorizontal = 0,
+    MSCycleDirectionVertical
 } MSCycleDirection;
 
 @protocol MSScrollViewDelegate <NSObject>
@@ -31,10 +31,25 @@ typedef enum{
 @end
 
 @interface MSScrollView : UIView <UIScrollViewDelegate,UIGestureRecognizerDelegate>
-@property (nonatomic,strong) id<MSScrollViewDelegate> delegate;
+/**
+ *  delegate
+ */
+@property (nonatomic,weak) id<MSScrollViewDelegate> delegate;
+/**
+ *  时间间隔
+ */
 @property (nonatomic,assign) CGFloat timeInterval;
-@property (nonatomic,assign) BOOL isAutoPlay;
-@property (nonatomic,strong) NSMutableArray *images;
+/**
+ *  是否要自动播放
+ */
+@property (nonatomic,assign,getter=isAutoPlay) BOOL autoPlay;
+/**
+ *  需要播放的图片名
+ */
+@property (nonatomic,copy) NSMutableArray *images;
+/**
+ *  方向(上下,左右)
+ */
 @property (nonatomic,assign) MSCycleDirection direction;
 /**
  *  构造方法
@@ -49,4 +64,11 @@ typedef enum{
  *  @return self
  */
 - (id)initWithFrame:(CGRect)frame images:(NSArray *)images delegate:(id<MSScrollViewDelegate>)delegate direction:(MSCycleDirection)direction autoPlay:(BOOL)autoPlay delay:(CGFloat)timeInterval;
+
+/**
+ *  支持网络图片
+ */
+@property (nonatomic, copy) NSMutableArray *imageUrls;
+- (id)initWithFrame:(CGRect)frame imageUrls:(NSArray *)imageUrls delegate:(id<MSScrollViewDelegate>)delegate direction:(MSCycleDirection)direction autoPlay:(BOOL)autoPlay delay:(CGFloat)timeInterval;
+
 @end
