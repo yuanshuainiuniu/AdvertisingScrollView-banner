@@ -1,8 +1,12 @@
 # AdvertisingScrollView
 ![image](https://github.com/yuanshuainiuniu/AdvertisingScrollView/blob/master/shot.gif)
 
-做了一些优化,用3个imageView复用创建,支持横屏和竖屏播放
+做了一些优化,用3个imageView复用创建,支持横屏和竖屏播放(3imageView for reuse)
 
+
+支持从网上下载图片(support load images from url)
+
+后续会添加文字描述
 
 a AdvertisingScrollView,can scroll auto,or by yourself.
 
