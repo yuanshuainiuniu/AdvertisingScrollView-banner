@@ -89,7 +89,7 @@
 }
 - (void)setImages:(NSMutableArray *)images{
     NSMutableArray *tempArr = [NSMutableArray arrayWithCapacity:images.count];
-    [images enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+    [images enumerateObjectsUsingBlock:^(id   obj, NSUInteger idx, BOOL *  stop) {
         UIImage *image = [UIImage imageNamed:(NSString *)obj];
         [tempArr addObject:image];
     }];
@@ -103,7 +103,7 @@
     _images = [NSMutableArray arrayWithCapacity:images.count];
 
     if (fromUrl) {
-        [images enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        [images enumerateObjectsUsingBlock:^(id   obj, NSUInteger idx, BOOL *  stop) {
             
             [[SDWebImageManager sharedManager] downloadImageWithURL:[NSURL URLWithString:(NSString *)obj] options:0 progress:^(NSInteger receivedSize, NSInteger expectedSize) {
 
