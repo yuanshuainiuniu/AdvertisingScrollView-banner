@@ -1,5 +1,5 @@
 # AdvertisingScrollView
-![image](https://github.com/yuanshuainiuniu/AdvertisingScrollView/blob/master/shot.png)
+![image](https://github.com/yuanshuainiuniu/AdvertisingScrollView/blob/master/shot.gif)
 
 做了一些优化,用3个imageView复用创建,支持横屏和竖屏播放
 

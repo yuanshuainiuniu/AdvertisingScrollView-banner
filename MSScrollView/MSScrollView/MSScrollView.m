@@ -7,6 +7,9 @@
 //
 
 #import "MSScrollView.h"
+#import "SDWebImageDownloader.h"
+#import "SDImageCache.h"
+#import "SDWebImageManager.h"
 #define kPageHeight 30
 @interface MSScrollView(){
     UIScrollView    *_scrollView;
@@ -45,18 +48,19 @@
     _autoPlay   = autoPlay;
     _timeInterval = timeInterval;
     _delegate     = delegate;
-    [self initImages:images];
-    [self commoninit];
+    [self initImages:images fromUrl:NO];
+    
     }
     return self;
 }
-- (id)initWithFrame:(CGRect)frame imageUrls:(NSArray *)imageUrls delegate:(id<MSScrollViewDelegate>)delegate direction:(MSCycleDirection)direction autoPlay:(BOOL)autoPlay delay:(CGFloat)timeInterval{
+- (id)initWithFrame:(CGRect)frame imageUrls:(NSArray *)imageUrls placeholderImage:(NSString *)placeholderImage delegate:(id<MSScrollViewDelegate>)delegate direction:(MSCycleDirection)direction autoPlay:(BOOL)autoPlay delay:(CGFloat)timeInterval{
     if (self      = [super initWithFrame:frame]) {
         _direction    = direction;
         _autoPlay   = autoPlay;
         _timeInterval = timeInterval;
         _delegate     = delegate;
-        [self initImages:imageUrls];
+        _placeholderImage = placeholderImage;
+        [self initImages:imageUrls fromUrl:YES];
         [self commoninit];
     }
     return self;
@@ -97,12 +101,38 @@
 #pragma mark-
 #pragma markPrivate methods
 /* 设置图片 */
-- (void)initImages:(NSArray *)images{
+- (void)initImages:(NSArray *)images fromUrl:(BOOL)fromUrl{
     _images = [NSMutableArray arrayWithCapacity:images.count];
-    for (NSString *imageName in images) {
-        [_images addObject:[UIImage imageNamed:imageName]];
+
+    if (fromUrl) {
+        [images enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            
+            [[SDWebImageManager sharedManager] downloadImageWithURL:[NSURL URLWithString:(NSString *)obj] options:0 progress:^(NSInteger receivedSize, NSInteger expectedSize) {
+
+            } completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, BOOL finished, NSURL *imageURL) {
+                if (image && finished)
+                {
+                    [_images addObject:image];
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [self commoninit];
+                    });
+                }else{
+                    [_images addObject:[UIImage imageNamed:(_placeholderImage == nil?@"MSSource.bundle/def.jpg":_placeholderImage)]];
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [self commoninit];
+                    });
+                }
+            }];
+        
+        }];
+        
+    }else{
+        for (NSString *imageName in images) {
+            [_images addObject:[UIImage imageNamed:imageName]];
+        }
     }
 }
+
 static UITapGestureRecognizer *tapGestureRecognizer;
 - (void)addScrollView{
     if (_scrollView == nil) {

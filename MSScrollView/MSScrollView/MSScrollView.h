@@ -68,7 +68,7 @@ typedef enum{
 /**
  *  支持网络图片
  */
-@property (nonatomic, copy) NSMutableArray *imageUrls;
-- (id)initWithFrame:(CGRect)frame imageUrls:(NSArray *)imageUrls delegate:(id<MSScrollViewDelegate>)delegate direction:(MSCycleDirection)direction autoPlay:(BOOL)autoPlay delay:(CGFloat)timeInterval;
+- (id)initWithFrame:(CGRect)frame imageUrls:(NSArray *)imageUrls placeholderImage:(NSString *)placeholderImage delegate:(id<MSScrollViewDelegate>)delegate direction:(MSCycleDirection)direction autoPlay:(BOOL)autoPlay delay:(CGFloat)timeInterval;
+@property (nonatomic, copy) NSString *placeholderImage;
 
 @end
