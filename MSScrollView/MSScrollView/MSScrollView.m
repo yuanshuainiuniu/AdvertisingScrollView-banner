@@ -7,8 +7,6 @@
 //
 
 #import "MSScrollView.h"
-#import "SDWebImageDownloader.h"
-#import "SDImageCache.h"
 #import "SDWebImageManager.h"
 #define kPageHeight 30
 @interface MSScrollView(){
