@@ -15,6 +15,8 @@ typedef enum{
 } MSCycleDirection;
 
 @protocol MSScrollViewDelegate <NSObject>
+
+@optional
 /**
  *  代理方法,点击返回图片的序号,
  *  可用于判断用户点击的图片号,进行图片的跳转等操作
@@ -31,6 +33,8 @@ typedef enum{
 @end
 
 @interface MSScrollView : UIView <UIScrollViewDelegate,UIGestureRecognizerDelegate>
+
+@property (nonatomic, assign) UIOffset pageControlOffset;
 /**
  *  delegate
  */
@@ -47,6 +51,10 @@ typedef enum{
  *  需要播放的图片名
  */
 @property (nonatomic,copy) NSMutableArray *images;
+/**
+ *  需要播放的网络图片
+ */
+@property (nonatomic,copy) NSMutableArray *urlImages;
 /**
  *  方向(上下,左右)
  */

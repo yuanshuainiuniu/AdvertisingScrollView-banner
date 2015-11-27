@@ -8,10 +8,11 @@
 
 #import "MSScrollView.h"
 #import "SDWebImageManager.h"
-#define kPageHeight 30
+#import "CustomerPageControl.h"
+#define kPageHeight 10
 @interface MSScrollView(){
     UIScrollView    *_scrollView;
-    UIPageControl   *_pageControl;
+    CustomerPageControl   *_pageControl;
     int _currentPage;
 }
 @property (nonatomic, strong) NSTimer *AutoTimer;
@@ -25,18 +26,24 @@
 - (UIImageView *)firstImageView{
     if (!_firstImageView) {
         _firstImageView = [[UIImageView alloc] init];
+//        _firstImageView.contentMode = UIViewContentModeScaleAspectFill;
+        _firstImageView.userInteractionEnabled = YES;
     }
     return _firstImageView;
 }
 - (UIImageView *)secondImageView{
     if (!_secondImageView) {
         _secondImageView = [[UIImageView alloc] init];
+//        _secondImageView.contentMode = UIViewContentModeScaleAspectFill;
+        _secondImageView.userInteractionEnabled = YES;
     }
     return _secondImageView;
 }
 - (UIImageView *)threeImageView{
     if (!_threeImageView) {
         _threeImageView = [[UIImageView alloc] init];
+//        _threeImageView.contentMode = UIViewContentModeScaleAspectFill;
+        _threeImageView.userInteractionEnabled = YES;
     }
     return _threeImageView;
 }
@@ -96,6 +103,16 @@
     _images = [tempArr copy];
     [self commoninit];
 }
+- (void)setUrlImages:(NSMutableArray *)urlImages{
+    
+    [self initImages:urlImages fromUrl:YES];
+    
+}
+
+- (void)setPageControlOffset:(UIOffset)pageControlOffset{
+    _pageControlOffset = pageControlOffset;
+    [self addPageControl];
+}
 #pragma mark-
 #pragma markPrivate methods
 /* 设置图片 */
@@ -105,19 +122,22 @@
     if (fromUrl) {
         [images enumerateObjectsUsingBlock:^(id   obj, NSUInteger idx, BOOL *  stop) {
             
-            [[SDWebImageManager sharedManager] downloadImageWithURL:[NSURL URLWithString:(NSString *)obj] options:0 progress:^(NSInteger receivedSize, NSInteger expectedSize) {
+            [[SDWebImageManager sharedManager] downloadImageWithURL:[NSURL URLWithString:(NSString *)obj] options:SDWebImageRetryFailed progress:^(NSInteger receivedSize, NSInteger expectedSize) {
 
             } completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, BOOL finished, NSURL *imageURL) {
+                
                 if (image && finished)
                 {
                     [_images addObject:image];
                     dispatch_async(dispatch_get_main_queue(), ^{
                         [self commoninit];
+                        
                     });
                 }else{
                     [_images addObject:[UIImage imageNamed:(_placeholderImage == nil?@"MSSource.bundle/def.jpg":_placeholderImage)]];
                     dispatch_async(dispatch_get_main_queue(), ^{
                         [self commoninit];
+                        
                     });
                 }
             }];
@@ -135,7 +155,7 @@ static UITapGestureRecognizer *tapGestureRecognizer;
 - (void)addScrollView{
     if (_scrollView == nil) {
         _scrollView                                = [[UIScrollView alloc] init];
-        _scrollView.backgroundColor = [UIColor blackColor];
+        _scrollView.backgroundColor = [UIColor whiteColor];
         _scrollView.delegate                       = self;
         _scrollView.pagingEnabled                  = YES;
         _scrollView.showsHorizontalScrollIndicator = NO;
@@ -178,12 +198,12 @@ static UITapGestureRecognizer *tapGestureRecognizer;
  */
 - (void)addPageControl{
     if (_pageControl == nil) {
-        _pageControl                               = [[UIPageControl alloc] init];
+        _pageControl                               = [[CustomerPageControl alloc] init];
         _pageControl.pageIndicatorTintColor        = [UIColor whiteColor];
-        _pageControl.currentPageIndicatorTintColor = [UIColor purpleColor];
+        _pageControl.currentPageIndicatorTintColor = [UIColor lightGrayColor];
         _pageControl.userInteractionEnabled        = NO;
     }
-   _pageControl.frame = CGRectMake(0, self.frame.size.height - kPageHeight, self.frame.size.width, kPageHeight);
+   _pageControl.frame = CGRectMake(_pageControlOffset.horizontal, self.frame.size.height-kPageHeight-_pageControlOffset.vertical, self.frame.size.width-_pageControlOffset.horizontal, kPageHeight);
     _pageControl.numberOfPages                 = _images.count;
     
     [self addSubview:_pageControl];
@@ -266,13 +286,18 @@ static UITapGestureRecognizer *tapGestureRecognizer;
 
 -(void)reloadData
 {
-    if (_images.count<3) {
+    
+    if (_images.count<=0) {
         return;
     }
     if (_currentPage==0) {
         self.firstImageView.image = [_images lastObject];
         self.secondImageView.image =_images[_currentPage];
-        self.threeImageView.image = _images[_currentPage+1];
+        if (_images.count == 1) {
+            self.threeImageView.image = [_images lastObject];
+        }else{
+            self.threeImageView.image = _images[_currentPage+1];
+        }
     }
     else if (_currentPage == _images.count-1)
     {
@@ -314,12 +339,16 @@ static UITapGestureRecognizer *tapGestureRecognizer;
 #pragma mark 展示下一页
 -(void)autoShowNextImage
 {
-    if (_currentPage == _images.count-1) {
+    
+    if (_images.count <= 0) {
+        return;
+    }
+    if (_currentPage >= _images.count-1) {
         _currentPage = 0;
     }else{
         _currentPage ++;
     }
-    [UIView animateWithDuration:.3 animations:^{
+    [UIView animateWithDuration:.5 animations:^{
         
         if (self.direction == MSCycleDirectionHorizontal) {
             _scrollView.contentOffset = CGPointMake(self.frame.size.width*2, 0);
