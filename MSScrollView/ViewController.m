@@ -50,6 +50,7 @@
 #pragma mark- MSScrollView Delegate
 - (void)MSScrollView:(MSScrollView *)MSScrollView didSelectPage:(NSInteger)index{
     NSLog(@"%ld",(long)index);
+    
 }
 - (void)MSScrollViewDidScroll:(UIScrollView *)scrollView{
     NSLog(@"contentOffset=%f",scrollView.contentOffset.x);
