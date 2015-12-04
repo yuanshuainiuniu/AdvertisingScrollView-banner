@@ -117,9 +117,15 @@
 #pragma markPrivate methods
 /* 设置图片 */
 - (void)initImages:(NSArray *)images fromUrl:(BOOL)fromUrl{
-    _images = [NSMutableArray arrayWithCapacity:images.count];
+    if (!_images) {
+        _images = [NSMutableArray arrayWithCapacity:images.count];
+    }
+    [_images removeAllObjects];
 
     if (fromUrl) {
+        for (int i= 0; i < images.count; i++) {
+            [_images addObject:[UIImage imageNamed:(_placeholderImage == nil?@"MSSource.bundle/def.jpg":_placeholderImage)]];
+        }
         [images enumerateObjectsUsingBlock:^(id   obj, NSUInteger idx, BOOL *  stop) {
             
             [[SDWebImageManager sharedManager] downloadImageWithURL:[NSURL URLWithString:(NSString *)obj] options:SDWebImageRetryFailed progress:^(NSInteger receivedSize, NSInteger expectedSize) {
@@ -128,17 +134,18 @@
                 
                 if (image && finished)
                 {
-                    [_images addObject:image];
+                    NSInteger index = [images indexOfObject:imageURL.absoluteString];
+                    [_images replaceObjectAtIndex:index withObject:image];
                     dispatch_async(dispatch_get_main_queue(), ^{
                         [self commoninit];
                         
                     });
                 }else{
-                    [_images addObject:[UIImage imageNamed:(_placeholderImage == nil?@"MSSource.bundle/def.jpg":_placeholderImage)]];
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [self commoninit];
-                        
-                    });
+//                    [_images addObject:[UIImage imageNamed:(_placeholderImage == nil?@"MSSource.bundle/def.jpg":_placeholderImage)]];
+//                    dispatch_async(dispatch_get_main_queue(), ^{
+//                        [self commoninit];
+//                        
+//                    });
                 }
             }];
         
