@@ -7,10 +7,13 @@
 //
 
 #import "MSScrollView.h"
-#import "SDWebImageManager.h"
+//#import "SDWebImageManager.h"
 #import "CustomerPageControl.h"
+#import <CommonCrypto/CommonDigest.h>
 #define kPageHeight 10
-@interface MSScrollView(){
+
+@interface MSScrollView()
+{
     UIScrollView    *_scrollView;
     CustomerPageControl   *_pageControl;
     int _currentPage;
@@ -22,6 +25,8 @@
 @end
 
 @implementation MSScrollView
+
+
 
 - (UIImageView *)firstImageView{
     if (!_firstImageView) {
@@ -69,6 +74,56 @@
         [self commoninit];
     }
     return self;
+}
+- (void)downLoadImageWithURL:(NSURL *)url success:(void(^)(UIImage* image,NSURL* url))completced{
+    NSString *path = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) firstObject] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.MSCache",[[NSBundle mainBundle].infoDictionary objectForKey:(__bridge NSString *)kCFBundleIdentifierKey]]];
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    BOOL existed = [fileManager fileExistsAtPath:path];
+    if (!existed) {
+        [fileManager createDirectoryAtPath:path withIntermediateDirectories:YES attributes:nil error:nil];
+    }
+    NSString *cachePatch = [path stringByAppendingPathComponent:[self stringFromMD5:url.absoluteString]];
+    
+    if ([fileManager fileExistsAtPath:cachePatch]) {
+        UIImage *image = [UIImage imageWithContentsOfFile:cachePatch];
+        if (image) {
+            completced(image,url);
+        }
+        
+    }else{
+        NSURLSessionConfiguration *sessionConfiguration = [NSURLSessionConfiguration defaultSessionConfiguration];
+        NSOperationQueue *queue = [[NSOperationQueue alloc] init];
+        NSURLSession *session = [NSURLSession sessionWithConfiguration:sessionConfiguration delegate:nil delegateQueue:queue];
+       __block NSURLSessionDownloadTask *downloadTask = [session downloadTaskWithURL:url completionHandler:^(NSURL * _Nullable location, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+            if (!error) {
+                NSString *toPath = [path stringByAppendingPathComponent:[self stringFromMD5:url.absoluteString]];
+                
+                [fileManager moveItemAtPath:location.path toPath:toPath error:nil];
+                UIImage *image = [UIImage imageWithContentsOfFile:toPath];
+                completced(image,response.URL);
+                downloadTask = nil;
+            }
+        }];
+        [downloadTask resume];
+    }
+    
+}
+- (NSString *) stringFromMD5:(NSString *)str{
+    
+    if(self == nil || [str length] == 0)
+        return nil;
+    
+    const char *value = [str UTF8String];
+    
+    unsigned char outputBuffer[CC_MD5_DIGEST_LENGTH];
+    CC_MD5(value, (CC_LONG)strlen(value), outputBuffer);
+    
+    NSMutableString *outputString = [[NSMutableString alloc] initWithCapacity:CC_MD5_DIGEST_LENGTH * 2];
+    for(NSInteger count = 0; count < CC_MD5_DIGEST_LENGTH; count++){
+        [outputString appendFormat:@"%02x",outputBuffer[count]];
+    }
+    
+    return outputString;
 }
 - (instancetype)initWithFrame:(CGRect)frame{
     if (self = [super initWithFrame:frame]) {
@@ -128,26 +183,38 @@
         }
         [images enumerateObjectsUsingBlock:^(id   obj, NSUInteger idx, BOOL *  stop) {
             
-            [[SDWebImageManager sharedManager] downloadImageWithURL:[NSURL URLWithString:(NSString *)obj] options:SDWebImageRetryFailed progress:^(NSInteger receivedSize, NSInteger expectedSize) {
-
-            } completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, BOOL finished, NSURL *imageURL) {
-                
-                if (image && finished)
+            [self downLoadImageWithURL:[NSURL URLWithString:(NSString *)obj] success:^(UIImage *image, NSURL *url) {
+                if (image )
                 {
-                    NSInteger index = [images indexOfObject:imageURL.absoluteString];
+                    NSInteger index = [images indexOfObject:url.absoluteString];
                     [_images replaceObjectAtIndex:index withObject:image];
                     dispatch_async(dispatch_get_main_queue(), ^{
                         [self commoninit];
                         
                     });
-                }else{
-//                    [_images addObject:[UIImage imageNamed:(_placeholderImage == nil?@"MSSource.bundle/def.jpg":_placeholderImage)]];
+                }
+            }];
+            
+//            [[SDWebImageManager sharedManager] downloadImageWithURL:[NSURL URLWithString:(NSString *)obj] options:SDWebImageRetryFailed progress:^(NSInteger receivedSize, NSInteger expectedSize) {
+//
+//            } completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, BOOL finished, NSURL *imageURL) {
+//                
+//                if (image && finished)
+//                {
+//                    NSInteger index = [images indexOfObject:imageURL.absoluteString];
+//                    [_images replaceObjectAtIndex:index withObject:image];
 //                    dispatch_async(dispatch_get_main_queue(), ^{
 //                        [self commoninit];
 //                        
 //                    });
-                }
-            }];
+//                }else{
+////                    [_images addObject:[UIImage imageNamed:(_placeholderImage == nil?@"MSSource.bundle/def.jpg":_placeholderImage)]];
+////                    dispatch_async(dispatch_get_main_queue(), ^{
+////                        [self commoninit];
+////                        
+////                    });
+//                }
+//            }];
         
         }];
         
@@ -372,5 +439,12 @@ static UITapGestureRecognizer *tapGestureRecognizer;
     [super layoutSubviews];
     [self commoninit];
 }
-
+- (void)clearCache{
+    NSString *path = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) firstObject] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.MSCache",[[NSBundle mainBundle].infoDictionary objectForKey:(__bridge NSString *)kCFBundleIdentifierKey]]];
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    BOOL existed = [fileManager fileExistsAtPath:path];
+    if (existed) {
+        [fileManager removeItemAtPath:path error:nil];
+    }
+}
 @end

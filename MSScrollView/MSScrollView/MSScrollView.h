@@ -78,5 +78,10 @@ typedef enum{
  */
 - (id)initWithFrame:(CGRect)frame imageUrls:(NSArray *)imageUrls placeholderImage:(NSString *)placeholderImage delegate:(id<MSScrollViewDelegate>)delegate direction:(MSCycleDirection)direction autoPlay:(BOOL)autoPlay delay:(CGFloat)timeInterval;
 @property (nonatomic, copy) NSString *placeholderImage;
-
+/**
+ *  @author Marshal, 16-01-07 17:01:19
+ *
+ *  @brief 清除缓存
+ */
+- (void)clearCache;
 @end
