@@ -22,6 +22,7 @@
 @property (nonatomic, strong) UIImageView *firstImageView;
 @property (nonatomic, strong) UIImageView *secondImageView;
 @property (nonatomic, strong) UIImageView *threeImageView;
+@property (nonatomic, strong) UITapGestureRecognizer *tapGestureRecognizer;
 @end
 
 @implementation MSScrollView
@@ -224,8 +225,6 @@
         }
     }
 }
-
-static UITapGestureRecognizer *tapGestureRecognizer;
 - (void)addScrollView{
     if (_scrollView == nil) {
         _scrollView                                = [[UIScrollView alloc] init];
@@ -236,20 +235,34 @@ static UITapGestureRecognizer *tapGestureRecognizer;
         _scrollView.showsVerticalScrollIndicator   = NO;
         _scrollView.scrollsToTop                   = NO;
         _scrollView.bounces = NO;
+
     }
     _scrollView.frame = self.bounds;
+    
+    CGFloat width = self.frame.size.width;
+    CGFloat height = self.frame.size.height;
+    [_scrollView addSubview:self.firstImageView];
+    [_scrollView addSubview:self.secondImageView];
+    [_scrollView addSubview:self.threeImageView];
+    
     if (self.direction == MSCycleDirectionHorizontal) {
+        self.firstImageView.frame = self.frame;
+        self.secondImageView.frame = CGRectMake(width, 0, width, height);
+        self.threeImageView.frame = CGRectMake(width*2, 0, width, height);
         _scrollView.contentSize = CGSizeMake(self.frame.size.width * 3, self.frame.size.height);
     }else{
+        self.firstImageView.frame = self.frame;
+        self.secondImageView.frame = CGRectMake(0, height, width, height);
+        self.threeImageView.frame = CGRectMake(0, height*2, width, height);
         _scrollView.contentSize = CGSizeMake(self.frame.size.width, self.frame.size.height * 3);
     }
    
-    if (tapGestureRecognizer == nil) {
-        tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(singleTapGestureRecognizer:)];
-        tapGestureRecognizer.numberOfTapsRequired    = 1;
-        tapGestureRecognizer.delegate                = self;
+    if (_tapGestureRecognizer == nil) {
+        _tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(singleTapGestureRecognizer:)];
+        _tapGestureRecognizer.numberOfTapsRequired    = 1;
+        _tapGestureRecognizer.delegate                = self;
     }
-    [_scrollView addGestureRecognizer:tapGestureRecognizer];
+    [_scrollView addGestureRecognizer:_tapGestureRecognizer];
 
     [self addSubview:_scrollView];
     if (self.isAutoPlay) {
@@ -265,6 +278,12 @@ static UITapGestureRecognizer *tapGestureRecognizer;
     if ([self.delegate respondsToSelector:@selector(MSScrollView:didSelectPage:)]) {
         [self.delegate MSScrollView:self didSelectPage:_pageControl.currentPage];
     }
+}
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch{
+    if ([gestureRecognizer isKindOfClass:[UIPanGestureRecognizer class]]) {
+        return NO;
+    }
+    return YES;
 }
 
 /**
@@ -286,13 +305,12 @@ static UITapGestureRecognizer *tapGestureRecognizer;
     if ([self.delegate respondsToSelector:@selector(MSScrollViewDidScroll:)]) {
         [self.delegate MSScrollViewDidScroll:_scrollView];
     }
+    [self playImages];
 }
--(void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
-{
-    
+- (void)playImages{
     if (self.direction == MSCycleDirectionHorizontal) {
         float x = _scrollView.contentOffset.x;
-
+        
         //往前翻
         if (x<=0 ) {
             if (_currentPage-1<0) {
@@ -300,6 +318,7 @@ static UITapGestureRecognizer *tapGestureRecognizer;
             }else{
                 _currentPage --;
             }
+            [self reloadData];
         }
         
         //往后翻
@@ -309,6 +328,7 @@ static UITapGestureRecognizer *tapGestureRecognizer;
             }else{
                 _currentPage ++;
             }
+            [self reloadData];
         }
     }else{
         float y = _scrollView.contentOffset.y;
@@ -320,6 +340,7 @@ static UITapGestureRecognizer *tapGestureRecognizer;
             }else{
                 _currentPage ++;
             }
+            [self reloadData];
         }
         //down
         if (y<self.frame.size.height) {
@@ -328,9 +349,9 @@ static UITapGestureRecognizer *tapGestureRecognizer;
             }else{
                 _currentPage --;
             }
+            [self reloadData];
         }
     }
-    [self reloadData];
 }
 -(void)scrollViewWillBeginDragging:(UIScrollView *)scrollView{
     [self removeTimer];
@@ -360,7 +381,6 @@ static UITapGestureRecognizer *tapGestureRecognizer;
 
 -(void)reloadData
 {
-    
     if (_images.count<=0) {
         return;
     }
@@ -385,27 +405,13 @@ static UITapGestureRecognizer *tapGestureRecognizer;
         self.secondImageView.image = _images[_currentPage];
         self.threeImageView.image = _images[_currentPage+1];
     }
-    
-    CGFloat width = self.frame.size.width;
-    CGFloat height = self.frame.size.height;
-    
-    [_scrollView addSubview:self.firstImageView];
-    [_scrollView addSubview:self.secondImageView];
-    [_scrollView addSubview:self.threeImageView];
-    
-    
     _pageControl.currentPage = _currentPage;
     if(self.direction == MSCycleDirectionHorizontal){
-        self.firstImageView.frame = self.frame;
-        self.secondImageView.frame = CGRectMake(width, 0, width, height);
-        self.threeImageView.frame = CGRectMake(width*2, 0, width, height);
-        _scrollView.contentOffset = CGPointMake(width, 0);
+        _scrollView.contentOffset = CGPointMake(self.frame.size.width, 0);
         
     }else{
-        self.firstImageView.frame = self.frame;
-        self.secondImageView.frame = CGRectMake(0, height, width, height);
-        self.threeImageView.frame = CGRectMake(0, height*2, width, height);
-        _scrollView.contentOffset = CGPointMake(0, height);
+        
+        _scrollView.contentOffset = CGPointMake(0, self.frame.size.height);
     }
     
     
@@ -413,26 +419,12 @@ static UITapGestureRecognizer *tapGestureRecognizer;
 #pragma mark 展示下一页
 -(void)autoShowNextImage
 {
-    
-    if (_images.count <= 0) {
-        return;
-    }
-    if (_currentPage >= _images.count-1) {
-        _currentPage = 0;
-    }else{
-        _currentPage ++;
-    }
-    [UIView animateWithDuration:.5 animations:^{
-        
-        if (self.direction == MSCycleDirectionHorizontal) {
-            _scrollView.contentOffset = CGPointMake(self.frame.size.width*2, 0);
+    if (self.direction == MSCycleDirectionHorizontal) {
+        [_scrollView setContentOffset:CGPointMake(self.frame.size.width*2, 0) animated:YES];
 
-        }else{
-            _scrollView.contentOffset = CGPointMake(0, self.frame.size.height*2);
-        }
-    } completion:^(BOOL finished) {
-        [self reloadData];
-    }];
+    }else{
+        [_scrollView setContentOffset:CGPointMake(0, self.frame.size.height*2) animated:YES];
+    }
     
 }
 - (void)layoutSubviews{
