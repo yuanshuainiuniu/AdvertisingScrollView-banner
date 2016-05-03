@@ -10,7 +10,7 @@
 //#import "SDWebImageManager.h"
 #import "CustomerPageControl.h"
 #import <CommonCrypto/CommonDigest.h>
-#define kPageHeight 10
+#define kPageHeight 8
 
 @interface MSScrollView()
 {
@@ -292,12 +292,13 @@
 - (void)addPageControl{
     if (_pageControl == nil) {
         _pageControl                               = [[CustomerPageControl alloc] init];
-        _pageControl.pageIndicatorTintColor        = [UIColor whiteColor];
-        _pageControl.currentPageIndicatorTintColor = [UIColor lightGrayColor];
+        _pageControl.pageIndicatorTintColor        = [UIColor colorWithWhite:0.7 alpha:0.5];
+        _pageControl.currentPageIndicatorTintColor = [UIColor purpleColor];
         _pageControl.userInteractionEnabled        = NO;
     }
-   _pageControl.frame = CGRectMake(_pageControlOffset.horizontal, self.frame.size.height-kPageHeight-_pageControlOffset.vertical, self.frame.size.width-_pageControlOffset.horizontal, kPageHeight);
     _pageControl.numberOfPages                 = _images.count;
+    
+   _pageControl.frame = CGRectMake(_pageControlOffset.horizontal+self.frame.size.width-_pageControl.frame.size.width, self.frame.size.height-kPageHeight-_pageControlOffset.vertical-1, self.frame.size.width-_pageControlOffset.horizontal, kPageHeight);
     
     [self addSubview:_pageControl];
 }
@@ -407,7 +408,8 @@
     }
     _pageControl.currentPage = _currentPage;
     if(self.direction == MSCycleDirectionHorizontal){
-        _scrollView.contentOffset = CGPointMake(self.frame.size.width, 0);
+//        _scrollView.contentOffset = CGPointMake(self.frame.size.width, 0);
+        [_scrollView setContentOffset:CGPointMake(self.frame.size.width, 0) animated:NO];
         
     }else{
         
