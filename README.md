@@ -10,6 +10,8 @@
 
 a AdvertisingScrollView,can scroll auto,or by yourself.
 
+Installation with CocoaPods：pod 'MSScrollView'
+
 Drag`MSScrollView.h` `MSScrollView.m` to your project<br>
 init：
 ```Objective-c
