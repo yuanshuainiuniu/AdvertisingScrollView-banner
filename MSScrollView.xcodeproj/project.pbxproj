@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		72489A5F1C08B2340059A2FF /* CustomerPageControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 72489A5E1C08B2340059A2FF /* CustomerPageControl.m */; };
 		F0486A611AF0941C00B57F99 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F0486A601AF0941C00B57F99 /* main.m */; };
 		F0486A641AF0941C00B57F99 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = F0486A631AF0941C00B57F99 /* AppDelegate.m */; };
 		F0486A671AF0941C00B57F99 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F0486A661AF0941C00B57F99 /* ViewController.m */; };
@@ -15,8 +14,9 @@
 		F0486A6C1AF0941C00B57F99 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F0486A6B1AF0941C00B57F99 /* Images.xcassets */; };
 		F0486A6F1AF0941C00B57F99 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = F0486A6D1AF0941C00B57F99 /* LaunchScreen.xib */; };
 		F0486A7B1AF0941C00B57F99 /* MSScrollViewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = F0486A7A1AF0941C00B57F99 /* MSScrollViewTests.m */; };
-		F3C3C17F1BB4E71300488B2D /* MSScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = F3C3C17D1BB4E71300488B2D /* MSScrollView.m */; };
-		F3C3C1881BB4EF0700488B2D /* MSSource.bundle in Resources */ = {isa = PBXBuildFile; fileRef = F3C3C1871BB4EF0700488B2D /* MSSource.bundle */; };
+		F3563E171D9BDF2B007B26D6 /* CustomerPageControl.m in Sources */ = {isa = PBXBuildFile; fileRef = F3563E131D9BDF2B007B26D6 /* CustomerPageControl.m */; };
+		F3563E181D9BDF2B007B26D6 /* MSScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = F3563E151D9BDF2B007B26D6 /* MSScrollView.m */; };
+		F3563E191D9BDF2B007B26D6 /* MSSource.bundle in Resources */ = {isa = PBXBuildFile; fileRef = F3563E161D9BDF2B007B26D6 /* MSSource.bundle */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -30,8 +30,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		72489A5D1C08B2340059A2FF /* CustomerPageControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomerPageControl.h; sourceTree = "<group>"; };
-		72489A5E1C08B2340059A2FF /* CustomerPageControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomerPageControl.m; sourceTree = "<group>"; };
 		F0486A5B1AF0941C00B57F99 /* MSScrollView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MSScrollView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F0486A5F1AF0941C00B57F99 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F0486A601AF0941C00B57F99 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -45,9 +43,11 @@
 		F0486A741AF0941C00B57F99 /* MSScrollViewTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MSScrollViewTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F0486A791AF0941C00B57F99 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F0486A7A1AF0941C00B57F99 /* MSScrollViewTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MSScrollViewTests.m; sourceTree = "<group>"; };
-		F3C3C17C1BB4E71300488B2D /* MSScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MSScrollView.h; sourceTree = "<group>"; };
-		F3C3C17D1BB4E71300488B2D /* MSScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MSScrollView.m; sourceTree = "<group>"; };
-		F3C3C1871BB4EF0700488B2D /* MSSource.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = MSSource.bundle; sourceTree = "<group>"; };
+		F3563E121D9BDF2B007B26D6 /* CustomerPageControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomerPageControl.h; sourceTree = "<group>"; };
+		F3563E131D9BDF2B007B26D6 /* CustomerPageControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomerPageControl.m; sourceTree = "<group>"; };
+		F3563E141D9BDF2B007B26D6 /* MSScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MSScrollView.h; sourceTree = "<group>"; };
+		F3563E151D9BDF2B007B26D6 /* MSScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MSScrollView.m; sourceTree = "<group>"; };
+		F3563E161D9BDF2B007B26D6 /* MSSource.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = MSSource.bundle; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -89,7 +89,7 @@
 		F0486A5D1AF0941C00B57F99 /* MSScrollView */ = {
 			isa = PBXGroup;
 			children = (
-				F3C3C17B1BB4E71300488B2D /* MSScrollView */,
+				F3563E111D9BDF2B007B26D6 /* MSScrollViewLib */,
 				F0486A621AF0941C00B57F99 /* AppDelegate.h */,
 				F0486A631AF0941C00B57F99 /* AppDelegate.m */,
 				F0486A651AF0941C00B57F99 /* ViewController.h */,
@@ -128,16 +128,16 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		F3C3C17B1BB4E71300488B2D /* MSScrollView */ = {
+		F3563E111D9BDF2B007B26D6 /* MSScrollViewLib */ = {
 			isa = PBXGroup;
 			children = (
-				72489A5D1C08B2340059A2FF /* CustomerPageControl.h */,
-				72489A5E1C08B2340059A2FF /* CustomerPageControl.m */,
-				F3C3C1871BB4EF0700488B2D /* MSSource.bundle */,
-				F3C3C17C1BB4E71300488B2D /* MSScrollView.h */,
-				F3C3C17D1BB4E71300488B2D /* MSScrollView.m */,
+				F3563E121D9BDF2B007B26D6 /* CustomerPageControl.h */,
+				F3563E131D9BDF2B007B26D6 /* CustomerPageControl.m */,
+				F3563E141D9BDF2B007B26D6 /* MSScrollView.h */,
+				F3563E151D9BDF2B007B26D6 /* MSScrollView.m */,
+				F3563E161D9BDF2B007B26D6 /* MSSource.bundle */,
 			);
-			path = MSScrollView;
+			path = MSScrollViewLib;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -220,7 +220,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F3C3C1881BB4EF0700488B2D /* MSSource.bundle in Resources */,
+				F3563E191D9BDF2B007B26D6 /* MSSource.bundle in Resources */,
 				F0486A6A1AF0941C00B57F99 /* Main.storyboard in Resources */,
 				F0486A6F1AF0941C00B57F99 /* LaunchScreen.xib in Resources */,
 				F0486A6C1AF0941C00B57F99 /* Images.xcassets in Resources */,
@@ -241,10 +241,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F3563E181D9BDF2B007B26D6 /* MSScrollView.m in Sources */,
+				F3563E171D9BDF2B007B26D6 /* CustomerPageControl.m in Sources */,
 				F0486A671AF0941C00B57F99 /* ViewController.m in Sources */,
 				F0486A641AF0941C00B57F99 /* AppDelegate.m in Sources */,
-				72489A5F1C08B2340059A2FF /* CustomerPageControl.m in Sources */,
-				F3C3C17F1BB4E71300488B2D /* MSScrollView.m in Sources */,
 				F0486A611AF0941C00B57F99 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
