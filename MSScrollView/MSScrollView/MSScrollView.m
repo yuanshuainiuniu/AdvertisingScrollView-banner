@@ -195,27 +195,6 @@
                     });
                 }
             }];
-            
-//            [[SDWebImageManager sharedManager] downloadImageWithURL:[NSURL URLWithString:(NSString *)obj] options:SDWebImageRetryFailed progress:^(NSInteger receivedSize, NSInteger expectedSize) {
-//
-//            } completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, BOOL finished, NSURL *imageURL) {
-//                
-//                if (image && finished)
-//                {
-//                    NSInteger index = [images indexOfObject:imageURL.absoluteString];
-//                    [_images replaceObjectAtIndex:index withObject:image];
-//                    dispatch_async(dispatch_get_main_queue(), ^{
-//                        [self commoninit];
-//                        
-//                    });
-//                }else{
-////                    [_images addObject:[UIImage imageNamed:(_placeholderImage == nil?@"MSSource.bundle/def.jpg":_placeholderImage)]];
-////                    dispatch_async(dispatch_get_main_queue(), ^{
-////                        [self commoninit];
-////                        
-////                    });
-//                }
-//            }];
         
         }];
         
