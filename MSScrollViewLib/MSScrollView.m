@@ -55,6 +55,9 @@
     
     UIImageView *imagv = [[UIImageView alloc] init];
     imagv.contentMode = UIViewContentModeScaleAspectFill;
+    if(self.contentModel){
+        imagv.contentMode = self.contentMode;
+    }
     imagv.userInteractionEnabled = YES;
     imagv.layer.masksToBounds = YES;
     return imagv;
