@@ -42,8 +42,17 @@
                        @"http://e.hiphotos.baidu.com/image/pic/item/7a899e510fb30f241e175064ca95d143ac4b0e3c3.jpg",
                        ];
     MSScrollView *scrollView = [[MSScrollView alloc] initWithFrame:self.view.bounds imageUrls:array placeholderImage:nil delegate:self direction:0 autoPlay:YES delay:2.0];
+//    scrollView.pageControlDir = MSPageControl_Right;
+    scrollView.pageControlOffset = UIOffsetMake(0, 10);
     [self.view addSubview:scrollView];
     
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+        scrollView.urlImages = array.mutableCopy;
+    });
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+        scrollView.urlImages = array.mutableCopy;
+    });
+
    
 }
 #pragma mark-

@@ -7,7 +7,6 @@
 //
 
 #import "MSScrollView.h"
-//#import "SDWebImageManager.h"
 #import "CustomerPageControl.h"
 #import <CommonCrypto/CommonDigest.h>
 #define kPageHeight 8
@@ -15,7 +14,6 @@
 @interface MSScrollView()
 {
     UIScrollView    *_scrollView;
-    CustomerPageControl   *_pageControl;
     int _currentPage;
 }
 @property (nonatomic, strong) NSTimer *AutoTimer;
@@ -23,36 +21,45 @@
 @property (nonatomic, strong) UIImageView *secondImageView;
 @property (nonatomic, strong) UIImageView *threeImageView;
 @property (nonatomic, strong) UITapGestureRecognizer *tapGestureRecognizer;
+@property (nonatomic, strong) NSMutableArray<NSURLSessionDownloadTask *> *downloadTaskArray;
 @end
 
 @implementation MSScrollView
 
-
+- (NSMutableArray<NSURLSessionDownloadTask *> *)downloadTaskArray{
+    if (!_downloadTaskArray) {
+        _downloadTaskArray = [NSMutableArray array];
+    }
+    return _downloadTaskArray;
+}
 
 - (UIImageView *)firstImageView{
     if (!_firstImageView) {
-        _firstImageView = [[UIImageView alloc] init];
-//        _firstImageView.contentMode = UIViewContentModeScaleAspectFill;
-        _firstImageView.userInteractionEnabled = YES;
+        _firstImageView = [self ImageView];
     }
     return _firstImageView;
 }
 - (UIImageView *)secondImageView{
     if (!_secondImageView) {
-        _secondImageView = [[UIImageView alloc] init];
-//        _secondImageView.contentMode = UIViewContentModeScaleAspectFill;
-        _secondImageView.userInteractionEnabled = YES;
+        _secondImageView = [self ImageView];
     }
     return _secondImageView;
 }
 - (UIImageView *)threeImageView{
     if (!_threeImageView) {
-        _threeImageView = [[UIImageView alloc] init];
-//        _threeImageView.contentMode = UIViewContentModeScaleAspectFill;
-        _threeImageView.userInteractionEnabled = YES;
+        _threeImageView = [self ImageView];
     }
     return _threeImageView;
 }
+- (UIImageView *)ImageView{
+    
+    UIImageView *imagv = [[UIImageView alloc] init];
+    imagv.contentMode = UIViewContentModeScaleAspectFill;
+    imagv.userInteractionEnabled = YES;
+    imagv.layer.masksToBounds = YES;
+    return imagv;
+}
+
 - (id)initWithFrame:(CGRect)frame images:(NSArray *)images delegate:(id<MSScrollViewDelegate>)delegate direction:(MSCycleDirection)direction autoPlay:(BOOL)autoPlay delay:(CGFloat)timeInterval{
     if (self      = [super initWithFrame:frame]) {
     _direction    = direction;
@@ -94,6 +101,7 @@
     }else{
         NSURLSessionConfiguration *sessionConfiguration = [NSURLSessionConfiguration defaultSessionConfiguration];
         NSOperationQueue *queue = [[NSOperationQueue alloc] init];
+        queue.maxConcurrentOperationCount = 6;
         NSURLSession *session = [NSURLSession sessionWithConfiguration:sessionConfiguration delegate:nil delegateQueue:queue];
        __block NSURLSessionDownloadTask *downloadTask = [session downloadTaskWithURL:url completionHandler:^(NSURL * _Nullable location, NSURLResponse * _Nullable response, NSError * _Nullable error) {
             if (!error) {
@@ -103,11 +111,23 @@
                 UIImage *image = [UIImage imageWithContentsOfFile:toPath];
                 completced(image,response.URL);
                 downloadTask = nil;
+                [self.downloadTaskArray removeObject:downloadTask];
             }
         }];
         [downloadTask resume];
+        [self.downloadTaskArray addObject:downloadTask];
     }
     
+}
+- (void)cancleAllTask{
+    for (NSURLSessionDownloadTask *task in self.downloadTaskArray) {
+        [task cancel];
+    }
+    [self.downloadTaskArray removeAllObjects];
+}
+- (void)dealloc{
+    [self removeTimer];
+    [self cancleAllTask];
 }
 - (NSString *) stringFromMD5:(NSString *)str{
     
@@ -128,6 +148,7 @@
 }
 - (instancetype)initWithFrame:(CGRect)frame{
     if (self = [super initWithFrame:frame]) {
+        
         [self commoninit];
     }
     return self;
@@ -173,22 +194,24 @@
 #pragma markPrivate methods
 /* 设置图片 */
 - (void)initImages:(NSArray *)images fromUrl:(BOOL)fromUrl{
-    if (!_images) {
-        _images = [NSMutableArray arrayWithCapacity:images.count];
-    }
-    [_images removeAllObjects];
-
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (!_images) {
+            _images = [NSMutableArray arrayWithCapacity:images.count];
+        }
+        [_images removeAllObjects];
+        [self cancleAllTask];
+        
     if (fromUrl) {
         for (int i= 0; i < images.count; i++) {
             [_images addObject:[UIImage imageNamed:(_placeholderImage == nil?@"MSSource.bundle/def.jpg":_placeholderImage)]];
         }
+        
         [images enumerateObjectsUsingBlock:^(id   obj, NSUInteger idx, BOOL *  stop) {
             
             [self downLoadImageWithURL:[NSURL URLWithString:(NSString *)obj] success:^(UIImage *image, NSURL *url) {
                 if (image )
                 {
-                    NSInteger index = [images indexOfObject:url.absoluteString];
-                    [_images replaceObjectAtIndex:index withObject:image];
+                    [_images replaceObjectAtIndex:idx withObject:image];
                     dispatch_async(dispatch_get_main_queue(), ^{
                         [self commoninit];
                         
@@ -203,6 +226,7 @@
             [_images addObject:[UIImage imageNamed:imageName]];
         }
     }
+        });
 }
 - (void)addScrollView{
     if (_scrollView == nil) {
@@ -276,8 +300,17 @@
         _pageControl.userInteractionEnabled        = NO;
     }
     _pageControl.numberOfPages                 = _images.count;
-    
-   _pageControl.frame = CGRectMake(_pageControlOffset.horizontal+self.frame.size.width-_pageControl.frame.size.width, self.frame.size.height-kPageHeight-_pageControlOffset.vertical-1, self.frame.size.width-_pageControlOffset.horizontal, kPageHeight);
+    if (!self.pageControlDir || self.pageControlDir == MSPageControl_Center) {
+        
+        _pageControl.frame = CGRectMake((self.frame.size.width-_pageControl.frame.size.width)/2, self.frame.size.height-kPageHeight-_pageControlOffset.vertical-1, self.frame.size.width-_pageControlOffset.horizontal, kPageHeight);
+        
+    }else if (self.pageControlDir == MSPageControl_Left){
+         _pageControl.frame = CGRectMake(_pageControlOffset.horizontal, self.frame.size.height-kPageHeight-_pageControlOffset.vertical-1, self.frame.size.width-_pageControlOffset.horizontal, kPageHeight);
+        
+    }else if (self.pageControlDir == MSPageControl_Right){
+        _pageControl.frame = CGRectMake(_pageControlOffset.horizontal+self.frame.size.width-_pageControl.frame.size.width, self.frame.size.height-kPageHeight-_pageControlOffset.vertical-1, self.frame.size.width-_pageControlOffset.horizontal, kPageHeight);
+    }
+   
     
     [self addSubview:_pageControl];
 }
@@ -355,9 +388,7 @@
         _AutoTimer = nil;
     }
 }
--(void)dealloc{
-    [self removeTimer];
-}
+
 
 -(void)reloadData
 {
@@ -387,7 +418,6 @@
     }
     _pageControl.currentPage = _currentPage;
     if(self.direction == MSCycleDirectionHorizontal){
-//        _scrollView.contentOffset = CGPointMake(self.frame.size.width, 0);
         [_scrollView setContentOffset:CGPointMake(self.frame.size.width, 0) animated:NO];
         
     }else{

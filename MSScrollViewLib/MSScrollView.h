@@ -9,10 +9,18 @@
 
 #import <UIKit/UIKit.h>
 @class MSScrollView;
+@class CustomerPageControl;
+
 typedef enum{
     MSCycleDirectionHorizontal = 0,
     MSCycleDirectionVertical
 } MSCycleDirection;
+
+typedef NS_ENUM(NSInteger, MSPageControlDirection) {
+    MSPageControl_Center = 0,
+    MSPageControl_Left,
+    MSPageControl_Right,
+};
 
 @protocol MSScrollViewDelegate <NSObject>
 
@@ -34,6 +42,9 @@ typedef enum{
 
 @interface MSScrollView : UIView <UIScrollViewDelegate,UIGestureRecognizerDelegate>
 
+/**
+ pageControl偏移量
+ */
 @property (nonatomic, assign) UIOffset pageControlOffset;
 /**
  *  delegate
@@ -56,9 +67,16 @@ typedef enum{
  */
 @property (nonatomic,copy) NSMutableArray *urlImages;
 /**
- *  方向(上下,左右)
+ *  滚动方向(上下,左右)
  */
 @property (nonatomic,assign) MSCycleDirection direction;
+
+/**
+ pageControl方向
+ */
+@property (nonatomic, assign) MSPageControlDirection pageControlDir;
+@property (nonatomic, strong) CustomerPageControl   *pageControl;
+;
 /**
  *  构造方法
  *
