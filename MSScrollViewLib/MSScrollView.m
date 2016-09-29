@@ -7,7 +7,6 @@
 //
 
 #import "MSScrollView.h"
-#import "CustomerPageControl.h"
 #import <CommonCrypto/CommonDigest.h>
 #define kPageHeight 8
 
