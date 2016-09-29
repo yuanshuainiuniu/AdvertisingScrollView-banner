@@ -8,8 +8,9 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "CustomerPageControl.h"
+
 @class MSScrollView;
-@class CustomerPageControl;
 
 typedef enum{
     MSCycleDirectionHorizontal = 0,
