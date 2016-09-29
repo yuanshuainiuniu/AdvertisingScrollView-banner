@@ -88,6 +88,10 @@ typedef NS_ENUM(NSInteger, MSPageControlDirection) {
 @property (nonatomic, assign) UIViewContentMode *contentModel;
 
 /**
+ 是否需要压缩图片
+ */
+@property (nonatomic, assign) BOOL shouldCompressImage;
+/**
  *  构造方法
  *
  *  @param frame        设置MSScrollView的frame属性
@@ -116,4 +120,9 @@ typedef NS_ENUM(NSInteger, MSPageControlDirection) {
  *  @brief 清除缓存
  */
 - (void)clearCache;
+
+/**
+ 移除定时器，生命周期结束时
+ */
+- (void)removeTimer;
 @end

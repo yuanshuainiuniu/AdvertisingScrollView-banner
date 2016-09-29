@@ -10,6 +10,12 @@
 #import <CommonCrypto/CommonDigest.h>
 #define kPageHeight 8
 
+#define dispatch_main_async_safe(block)\
+if ([NSThread isMainThread]) {\
+block();\
+} else {\
+dispatch_async(dispatch_get_main_queue(), block);\
+}
 @interface MSScrollView()
 {
     UIScrollView    *_scrollView;
@@ -64,12 +70,12 @@
 
 - (id)initWithFrame:(CGRect)frame images:(NSArray *)images delegate:(id<MSScrollViewDelegate>)delegate direction:(MSCycleDirection)direction autoPlay:(BOOL)autoPlay delay:(CGFloat)timeInterval{
     if (self      = [super initWithFrame:frame]) {
-    _direction    = direction;
-    _autoPlay   = autoPlay;
-    _timeInterval = timeInterval;
-    _delegate     = delegate;
-    [self initImages:images fromUrl:NO];
-    
+        _direction    = direction;
+        _autoPlay   = autoPlay;
+        _timeInterval = timeInterval;
+        _delegate     = delegate;
+        [self initImages:images fromUrl:NO];
+        
     }
     return self;
 }
@@ -102,18 +108,28 @@
         
     }else{
         NSURLSessionConfiguration *sessionConfiguration = [NSURLSessionConfiguration defaultSessionConfiguration];
+        sessionConfiguration.timeoutIntervalForRequest = 15;
         NSOperationQueue *queue = [[NSOperationQueue alloc] init];
         queue.maxConcurrentOperationCount = 6;
         NSURLSession *session = [NSURLSession sessionWithConfiguration:sessionConfiguration delegate:nil delegateQueue:queue];
-       __block NSURLSessionDownloadTask *downloadTask = [session downloadTaskWithURL:url completionHandler:^(NSURL * _Nullable location, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+        __block NSURLSessionDownloadTask *downloadTask = [session downloadTaskWithURL:url completionHandler:^(NSURL * _Nullable location, NSURLResponse * _Nullable response, NSError * _Nullable error) {
             if (!error) {
                 NSString *toPath = [path stringByAppendingPathComponent:[self stringFromMD5:url.absoluteString]];
                 
                 [fileManager moveItemAtPath:location.path toPath:toPath error:nil];
                 UIImage *image = [UIImage imageWithContentsOfFile:toPath];
+                if (self.shouldCompressImage){
+                    NSData *fData = UIImageJPEGRepresentation(image, 1.0);
+                    while(fData.length>1024*1024*1) {//大于2m
+                        image = [self imageCompressForWidth:image targetWidth:image.size.width*0.8];
+                        fData = UIImageJPEGRepresentation(image, 1.0);
+                    }
+                }
+                
                 completced(image,response.URL);
-                downloadTask = nil;
                 [self.downloadTaskArray removeObject:downloadTask];
+                downloadTask = nil;
+                
             }
         }];
         [downloadTask resume];
@@ -121,14 +137,60 @@
     }
     
 }
+#pragma mark - 压缩图片
+- (UIImage *) imageCompressForWidth:(UIImage *)sourceImage targetWidth:(CGFloat)defineWidth{
+    UIImage *newImage = nil;
+    CGSize imageSize = sourceImage.size;
+    CGFloat width = imageSize.width;
+    CGFloat height = imageSize.height;
+    CGFloat targetWidth = defineWidth;
+    CGFloat targetHeight = height / (width / targetWidth);
+    CGSize size = CGSizeMake(targetWidth, targetHeight);
+    CGFloat scaleFactor = 0.0;
+    CGFloat scaledWidth = targetWidth;
+    CGFloat scaledHeight = targetHeight;
+    CGPoint thumbnailPoint = CGPointMake(0.0, 0.0);
+    if(CGSizeEqualToSize(imageSize, size) == NO){
+        CGFloat widthFactor = targetWidth / width;
+        CGFloat heightFactor = targetHeight / height;
+        if(widthFactor > heightFactor){
+            scaleFactor = widthFactor;
+        }
+        else{
+            scaleFactor = heightFactor;
+        }
+        scaledWidth = width * scaleFactor;
+        scaledHeight = height * scaleFactor;
+        if(widthFactor > heightFactor){
+            thumbnailPoint.y = (targetHeight - scaledHeight) * 0.5;
+        }else if(widthFactor < heightFactor){
+            thumbnailPoint.x = (targetWidth - scaledWidth) * 0.5;
+        }
+    }
+    UIGraphicsBeginImageContext(size);
+    CGRect thumbnailRect = CGRectZero;
+    thumbnailRect.origin = thumbnailPoint;
+    thumbnailRect.size.width = scaledWidth;
+    thumbnailRect.size.height = scaledHeight;
+    
+    [sourceImage drawInRect:thumbnailRect];
+    
+    newImage = UIGraphicsGetImageFromCurrentImageContext();
+    if(newImage == nil){
+        NSLog(@"scale image fail");
+    }
+    
+    UIGraphicsEndImageContext();
+    return newImage;
+}
 - (void)cancleAllTask{
     for (NSURLSessionDownloadTask *task in self.downloadTaskArray) {
         [task cancel];
     }
+    
     [self.downloadTaskArray removeAllObjects];
 }
 - (void)dealloc{
-    [self removeTimer];
     [self cancleAllTask];
 }
 - (NSString *) stringFromMD5:(NSString *)str{
@@ -179,7 +241,7 @@
         UIImage *image = [UIImage imageNamed:(NSString *)obj];
         [tempArr addObject:image];
     }];
-    _images = [tempArr copy];
+    _images = [tempArr mutableCopy];
     [self commoninit];
 }
 - (void)setUrlImages:(NSMutableArray *)urlImages{
@@ -196,39 +258,39 @@
 #pragma markPrivate methods
 /* 设置图片 */
 - (void)initImages:(NSArray *)images fromUrl:(BOOL)fromUrl{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (!_images) {
-            _images = [NSMutableArray arrayWithCapacity:images.count];
+    dispatch_main_async_safe(^{
+        
+        if (self.images == nil) {
+            self.images = [NSMutableArray arrayWithCapacity:images.count];
         }
-        [_images removeAllObjects];
+        [self.images removeAllObjects];
         [self cancleAllTask];
         
-    if (fromUrl) {
-        for (int i= 0; i < images.count; i++) {
-            [_images addObject:[UIImage imageNamed:(_placeholderImage == nil?@"MSSource.bundle/def.jpg":_placeholderImage)]];
-        }
-        
-        [images enumerateObjectsUsingBlock:^(id   obj, NSUInteger idx, BOOL *  stop) {
+        if (fromUrl) {
+            for (int i= 0; i < images.count; i++) {
+                [self.images addObject:[UIImage imageNamed:(self.placeholderImage == nil?@"MSSource.bundle/def.jpg":self.placeholderImage)]];
+            }
             
-            [self downLoadImageWithURL:[NSURL URLWithString:(NSString *)obj] success:^(UIImage *image, NSURL *url) {
-                if (image )
-                {
-                    [_images replaceObjectAtIndex:idx withObject:image];
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [self commoninit];
-                        
-                    });
-                }
+            [images enumerateObjectsUsingBlock:^(id   obj, NSUInteger idx, BOOL *  stop) {
+                __weak __typeof(self)weakSelf = self;
+                [weakSelf downLoadImageWithURL:[NSURL URLWithString:(NSString *)obj] success:^(UIImage *image, NSURL *url) {
+                    if (image )
+                    {
+                        [weakSelf.images replaceObjectAtIndex:idx withObject:image];
+                        dispatch_main_async_safe(^{
+                            [weakSelf commoninit];
+                        });
+                    }
+                }];
+                
             }];
-        
-        }];
-        
-    }else{
-        for (NSString *imageName in images) {
-            [_images addObject:[UIImage imageNamed:imageName]];
+            
+        }else{
+            for (NSString *imageName in images) {
+                [self.images addObject:[UIImage imageNamed:imageName]];
+            }
         }
-    }
-        });
+    });
 }
 - (void)addScrollView{
     if (_scrollView == nil) {
@@ -240,7 +302,7 @@
         _scrollView.showsVerticalScrollIndicator   = NO;
         _scrollView.scrollsToTop                   = NO;
         _scrollView.bounces = NO;
-
+        
     }
     _scrollView.frame = self.bounds;
     
@@ -261,14 +323,14 @@
         self.threeImageView.frame = CGRectMake(0, height*2, width, height);
         _scrollView.contentSize = CGSizeMake(self.frame.size.width, self.frame.size.height * 3);
     }
-   
+    
     if (_tapGestureRecognizer == nil) {
         _tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(singleTapGestureRecognizer:)];
         _tapGestureRecognizer.numberOfTapsRequired    = 1;
         _tapGestureRecognizer.delegate                = self;
     }
     [_scrollView addGestureRecognizer:_tapGestureRecognizer];
-
+    
     [self addSubview:_scrollView];
     if (self.isAutoPlay) {
         [self addTimer];
@@ -307,12 +369,12 @@
         _pageControl.frame = CGRectMake((self.frame.size.width-_pageControl.frame.size.width)/2, self.frame.size.height-kPageHeight-_pageControlOffset.vertical-1, self.frame.size.width-_pageControlOffset.horizontal, kPageHeight);
         
     }else if (self.pageControlDir == MSPageControl_Left){
-         _pageControl.frame = CGRectMake(_pageControlOffset.horizontal, self.frame.size.height-kPageHeight-_pageControlOffset.vertical-1, self.frame.size.width-_pageControlOffset.horizontal, kPageHeight);
+        _pageControl.frame = CGRectMake(_pageControlOffset.horizontal, self.frame.size.height-kPageHeight-_pageControlOffset.vertical-1, self.frame.size.width-_pageControlOffset.horizontal, kPageHeight);
         
     }else if (self.pageControlDir == MSPageControl_Right){
         _pageControl.frame = CGRectMake(_pageControlOffset.horizontal+self.frame.size.width-_pageControl.frame.size.width, self.frame.size.height-kPageHeight-_pageControlOffset.vertical-1, self.frame.size.width-_pageControlOffset.horizontal, kPageHeight);
     }
-   
+    
     
     [self addSubview:_pageControl];
 }
@@ -379,9 +441,9 @@
 - (void)addTimer{
     [self removeTimer];
     self.AutoTimer = [NSTimer scheduledTimerWithTimeInterval:(_timeInterval>0?_timeInterval:2.5) target:self selector:@selector(autoShowNextImage) userInfo:nil repeats:YES];
-
+    
     [[NSRunLoop mainRunLoop] addTimer:self.AutoTimer forMode:NSRunLoopCommonModes];
-
+    
 }
 - (void)removeTimer{
     
@@ -434,7 +496,7 @@
 {
     if (self.direction == MSCycleDirectionHorizontal) {
         [_scrollView setContentOffset:CGPointMake(self.frame.size.width*2, 0) animated:YES];
-
+        
     }else{
         [_scrollView setContentOffset:CGPointMake(0, self.frame.size.height*2) animated:YES];
     }

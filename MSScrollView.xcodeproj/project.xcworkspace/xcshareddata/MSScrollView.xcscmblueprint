@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "23849625F24245AD8C9EE273CB316C55945FD386",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "23849625F24245AD8C9EE273CB316C55945FD386" : 0,
+    "A1575FD0CFF59B617F3049F705B17648AAADB674" : 9223372036854775807
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "71B9685E-754C-46AC-A798-C6FFE79FCF95",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "23849625F24245AD8C9EE273CB316C55945FD386" : "AdvertisingScrollView-banner\/",
+    "A1575FD0CFF59B617F3049F705B17648AAADB674" : ""
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "MSScrollView",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "MSScrollView.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/yuanshuainiuniu\/AdvertisingScrollView.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "23849625F24245AD8C9EE273CB316C55945FD386"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/git.oschina.net\/marshal\/laiyifen_swift.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "A1575FD0CFF59B617F3049F705B17648AAADB674"
+    }
+  ]
+}
