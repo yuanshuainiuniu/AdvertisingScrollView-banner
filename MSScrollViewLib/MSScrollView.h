@@ -125,4 +125,9 @@ typedef NS_ENUM(NSInteger, MSPageControlDirection) {
  移除定时器，生命周期结束时
  */
 - (void)removeTimer;
+
+/**
+ 合理的管理定时器
+ */
+- (void)addTimer;
 @end

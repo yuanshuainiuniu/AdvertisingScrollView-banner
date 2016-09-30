@@ -26,9 +26,9 @@ static const CGFloat margin = 5.0f;
     CGRect frame = self.frame;
     frame.size.width = (numberOfPages+1)*margin + frame.size.height *numberOfPages;
     self.frame = frame;
-    
-    while (self.subviews.count) {
-        [[self.subviews lastObject] removeFromSuperview];
+
+    for (UIView *sub in self.subviews) {
+        [sub removeFromSuperview];
     }
     
     for (int i = 0; i<numberOfPages; i++) {
