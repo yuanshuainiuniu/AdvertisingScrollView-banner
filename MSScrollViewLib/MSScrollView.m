@@ -268,7 +268,8 @@ dispatch_async(dispatch_get_main_queue(), block);\
         
         if (fromUrl) {
             for (int i= 0; i < images.count; i++) {
-                [self.images addObject:[UIImage imageNamed:(self.placeholderImage == nil?@"MSSource.bundle/def.jpg":self.placeholderImage)]];
+                UIImage *placeHold = [UIImage imageNamed:(self.placeholderImage == nil?@"MSSource.bundle/def.jpg":self.placeholderImage)];
+                [self.images addObject:placeHold != nil?placeHold:@""];
             }
             
             [images enumerateObjectsUsingBlock:^(id   obj, NSUInteger idx, BOOL *  stop) {
