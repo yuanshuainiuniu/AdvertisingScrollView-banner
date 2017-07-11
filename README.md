@@ -10,6 +10,8 @@
 
 a AdvertisingScrollView,can scroll auto,or by yourself.
 
+[Swift版本点这里](https://github.com/yuanshuainiuniu/MSScrollViewSwift)
+
 使用方式:
 Installation with CocoaPods：pod 'MS_ScrollView'
 或者下载demo
