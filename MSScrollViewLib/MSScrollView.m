@@ -314,12 +314,12 @@ dispatch_async(dispatch_get_main_queue(), block);\
     [_scrollView addSubview:self.threeImageView];
     
     if (self.direction == MSCycleDirectionHorizontal) {
-        self.firstImageView.frame = self.frame;
+        self.firstImageView.frame = self.bounds;
         self.secondImageView.frame = CGRectMake(width, 0, width, height);
         self.threeImageView.frame = CGRectMake(width*2, 0, width, height);
         _scrollView.contentSize = CGSizeMake(self.frame.size.width * 3, self.frame.size.height);
     }else{
-        self.firstImageView.frame = self.frame;
+        self.firstImageView.frame = self.bounds;
         self.secondImageView.frame = CGRectMake(0, height, width, height);
         self.threeImageView.frame = CGRectMake(0, height*2, width, height);
         _scrollView.contentSize = CGSizeMake(self.frame.size.width, self.frame.size.height * 3);
