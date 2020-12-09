@@ -79,7 +79,7 @@ dispatch_async(dispatch_get_main_queue(), block);\
     }
     return self;
 }
-- (id)initWithFrame:(CGRect)frame imageUrls:(NSArray *)imageUrls placeholderImage:(NSString *)placeholderImage delegate:(id<MSScrollViewDelegate>)delegate direction:(MSCycleDirection)direction autoPlay:(BOOL)autoPlay delay:(CGFloat)timeInterval{
+- (id)initWithFrame:(CGRect)frame imageUrls:(NSArray *)imageUrls placeholderImage:(UIImage *)placeholderImage delegate:(id<MSScrollViewDelegate>)delegate direction:(MSCycleDirection)direction autoPlay:(BOOL)autoPlay delay:(CGFloat)timeInterval{
     if (self      = [super initWithFrame:frame]) {
         _direction    = direction;
         _autoPlay   = autoPlay;
@@ -268,8 +268,7 @@ dispatch_async(dispatch_get_main_queue(), block);\
         
         if (fromUrl) {
             for (int i= 0; i < images.count; i++) {
-                UIImage *placeHold = [UIImage imageNamed:(self.placeholderImage == nil?@"MSSource.bundle/def.jpg":self.placeholderImage)];
-                [self.images addObject:placeHold != nil?placeHold:@""];
+                [self.images addObject:self.placeholderImage ? self.placeholderImage : [UIImage new]];
             }
             
             [images enumerateObjectsUsingBlock:^(id   obj, NSUInteger idx, BOOL *  stop) {

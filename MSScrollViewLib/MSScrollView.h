@@ -108,12 +108,12 @@ typedef NS_ENUM(NSInteger, MSPageControlDirection) {
 /**
  *  支持网络图片
  */
-- (id)initWithFrame:(CGRect)frame imageUrls:(NSArray *)imageUrls placeholderImage:(NSString *)placeholderImage delegate:(id<MSScrollViewDelegate>)delegate direction:(MSCycleDirection)direction autoPlay:(BOOL)autoPlay delay:(CGFloat)timeInterval;
+- (id)initWithFrame:(CGRect)frame imageUrls:(NSArray *)imageUrls placeholderImage:(UIImage *)placeholderImage delegate:(id<MSScrollViewDelegate>)delegate direction:(MSCycleDirection)direction autoPlay:(BOOL)autoPlay delay:(CGFloat)timeInterval;
 
 /**
  占位图
  */
-@property (nonatomic, copy) NSString *placeholderImage;
+@property (nonatomic, strong) UIImage *placeholderImage;
 /**
  *  @author Marshal, 16-01-07 17:01:19
  *

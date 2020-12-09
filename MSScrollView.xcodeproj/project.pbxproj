@@ -16,7 +16,6 @@
 		F0486A7B1AF0941C00B57F99 /* MSScrollViewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = F0486A7A1AF0941C00B57F99 /* MSScrollViewTests.m */; };
 		F3563E201D9BE503007B26D6 /* CustomerPageControl.m in Sources */ = {isa = PBXBuildFile; fileRef = F3563E1C1D9BE503007B26D6 /* CustomerPageControl.m */; };
 		F3563E211D9BE503007B26D6 /* MSScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = F3563E1E1D9BE503007B26D6 /* MSScrollView.m */; };
-		F3563E221D9BE503007B26D6 /* MSSource.bundle in Resources */ = {isa = PBXBuildFile; fileRef = F3563E1F1D9BE503007B26D6 /* MSSource.bundle */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,7 +46,6 @@
 		F3563E1C1D9BE503007B26D6 /* CustomerPageControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomerPageControl.m; sourceTree = "<group>"; };
 		F3563E1D1D9BE503007B26D6 /* MSScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MSScrollView.h; sourceTree = "<group>"; };
 		F3563E1E1D9BE503007B26D6 /* MSScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MSScrollView.m; sourceTree = "<group>"; };
-		F3563E1F1D9BE503007B26D6 /* MSSource.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = MSSource.bundle; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -135,7 +133,6 @@
 				F3563E1C1D9BE503007B26D6 /* CustomerPageControl.m */,
 				F3563E1D1D9BE503007B26D6 /* MSScrollView.h */,
 				F3563E1E1D9BE503007B26D6 /* MSScrollView.m */,
-				F3563E1F1D9BE503007B26D6 /* MSSource.bundle */,
 			);
 			path = MSScrollViewLib;
 			sourceTree = "<group>";
@@ -220,7 +217,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F3563E221D9BE503007B26D6 /* MSSource.bundle in Resources */,
 				F0486A6A1AF0941C00B57F99 /* Main.storyboard in Resources */,
 				F0486A6F1AF0941C00B57F99 /* LaunchScreen.xib in Resources */,
 				F0486A6C1AF0941C00B57F99 /* Images.xcassets in Resources */,
