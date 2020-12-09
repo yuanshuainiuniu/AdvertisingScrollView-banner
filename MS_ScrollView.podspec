@@ -8,6 +8,6 @@ s.author = { 'yuanshuai' => '717999274@qq.com' }
 s.platform = :ios, '7.0'
 s.source = { :git => 'https://github.com/yuanshuainiuniu/AdvertisingScrollView-banner.git', :tag => s.version }
 s.source_files = 'MSScrollViewLib/**/*.{h,m}'
-s.resource     = 'MSScrollViewLib/MSSource.bundle'
+#s.resource     = 'MSScrollViewLib/MSSource.bundle'
 s.requires_arc = true
 end
