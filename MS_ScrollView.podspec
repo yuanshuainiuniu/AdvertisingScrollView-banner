@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
 s.name = 'MS_ScrollView'
-s.version = '0.1.7'
+s.version = '0.1.8'
 s.summary = 'The easiest way to use pull-to-refresh with Swift2.0 program language.'
 s.homepage = 'https://github.com/yuanshuainiuniu/AdvertisingScrollView-banner'
 s.license = 'MIT'

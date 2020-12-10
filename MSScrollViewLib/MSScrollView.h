@@ -85,7 +85,7 @@ typedef NS_ENUM(NSInteger, MSPageControlDirection) {
 /**
  图片的填充方式
  */
-@property (nonatomic, assign) UIViewContentMode *contentModel;
+@property (nonatomic, assign) UIViewContentMode contentMode;
 
 /**
  是否需要压缩图片

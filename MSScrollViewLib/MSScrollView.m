@@ -60,9 +60,6 @@ dispatch_async(dispatch_get_main_queue(), block);\
     
     UIImageView *imagv = [[UIImageView alloc] init];
     imagv.contentMode = UIViewContentModeScaleAspectFill;
-    if(self.contentModel){
-        imagv.contentMode = self.contentMode;
-    }
     imagv.userInteractionEnabled = YES;
     imagv.layer.masksToBounds = YES;
     return imagv;
@@ -249,6 +246,12 @@ dispatch_async(dispatch_get_main_queue(), block);\
     [self initImages:urlImages fromUrl:YES];
     
 }
+- (void)setContentMode:(UIViewContentMode)contentMode{
+    _contentMode = contentMode;
+    _firstImageView.contentMode = contentMode;
+    _secondImageView.contentMode = contentMode;
+    _threeImageView.contentMode = contentMode;
+}
 
 - (void)setPageControlOffset:(UIOffset)pageControlOffset{
     _pageControlOffset = pageControlOffset;
@@ -399,7 +402,7 @@ dispatch_async(dispatch_get_main_queue(), block);\
         }
         
         //往后翻
-        if (x>=self.frame.size.width*2 ) {
+        if (x>=floorf(self.frame.size.width*2) ) {
             if (_currentPage==_images.count-1) {
                 _currentPage = 0;
             }else{
@@ -410,7 +413,7 @@ dispatch_async(dispatch_get_main_queue(), block);\
     }else{
         float y = _scrollView.contentOffset.y;
         //up
-        if (y>self.frame.size.height ) {
+        if (y>floorf(self.frame.size.height) ) {
             
             if (_currentPage==_images.count-1) {
                 _currentPage = 0;
@@ -420,7 +423,7 @@ dispatch_async(dispatch_get_main_queue(), block);\
             [self reloadData];
         }
         //down
-        if (y<self.frame.size.height) {
+        if (y<floorf(self.frame.size.height)) {
             if (_currentPage-1<0) {
                 _currentPage = (int)_images.count-1;
             }else{
