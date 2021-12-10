@@ -16,6 +16,42 @@ block();\
 } else {\
 dispatch_async(dispatch_get_main_queue(), block);\
 }
+
+@interface MSProxy : NSProxy
+//通过创建对象
+- (instancetype)initWithObjc:(id)object;
+
+//通过类方法创建创建
++ (instancetype)proxyWithObjc:(id)object;
+@property (nonatomic, weak) id object;
+@end
+@implementation MSProxy
+
+- (instancetype)initWithObjc:(id)object {
+    
+    self.object = object;
+    return self;
+}
+
++ (instancetype)proxyWithObjc:(id)object {
+    
+    return [[self alloc] initWithObjc:object];
+}
+
+- (void)forwardInvocation:(NSInvocation *)invocation {
+    
+    if ([self.object respondsToSelector:invocation.selector]) {
+        
+        [invocation invokeWithTarget:self.object];
+    }
+}
+
+- (NSMethodSignature *)methodSignatureForSelector:(SEL)sel {
+    
+    return [self.object methodSignatureForSelector:sel];
+}
+@end
+
 @interface MSScrollView()
 {
     UIScrollView    *_scrollView;
@@ -137,47 +173,50 @@ dispatch_async(dispatch_get_main_queue(), block);\
 #pragma mark - 压缩图片
 - (UIImage *) imageCompressForWidth:(UIImage *)sourceImage targetWidth:(CGFloat)defineWidth{
     UIImage *newImage = nil;
-    CGSize imageSize = sourceImage.size;
-    CGFloat width = imageSize.width;
-    CGFloat height = imageSize.height;
-    CGFloat targetWidth = defineWidth;
-    CGFloat targetHeight = height / (width / targetWidth);
-    CGSize size = CGSizeMake(targetWidth, targetHeight);
-    CGFloat scaleFactor = 0.0;
-    CGFloat scaledWidth = targetWidth;
-    CGFloat scaledHeight = targetHeight;
-    CGPoint thumbnailPoint = CGPointMake(0.0, 0.0);
-    if(CGSizeEqualToSize(imageSize, size) == NO){
-        CGFloat widthFactor = targetWidth / width;
-        CGFloat heightFactor = targetHeight / height;
-        if(widthFactor > heightFactor){
-            scaleFactor = widthFactor;
+    @autoreleasepool {
+        CGSize imageSize = sourceImage.size;
+        CGFloat width = imageSize.width;
+        CGFloat height = imageSize.height;
+        CGFloat targetWidth = defineWidth;
+        CGFloat targetHeight = height / (width / targetWidth);
+        CGSize size = CGSizeMake(targetWidth, targetHeight);
+        CGFloat scaleFactor = 0.0;
+        CGFloat scaledWidth = targetWidth;
+        CGFloat scaledHeight = targetHeight;
+        CGPoint thumbnailPoint = CGPointMake(0.0, 0.0);
+        if(CGSizeEqualToSize(imageSize, size) == NO){
+            CGFloat widthFactor = targetWidth / width;
+            CGFloat heightFactor = targetHeight / height;
+            if(widthFactor > heightFactor){
+                scaleFactor = widthFactor;
+            }
+            else{
+                scaleFactor = heightFactor;
+            }
+            scaledWidth = width * scaleFactor;
+            scaledHeight = height * scaleFactor;
+            if(widthFactor > heightFactor){
+                thumbnailPoint.y = (targetHeight - scaledHeight) * 0.5;
+            }else if(widthFactor < heightFactor){
+                thumbnailPoint.x = (targetWidth - scaledWidth) * 0.5;
+            }
         }
-        else{
-            scaleFactor = heightFactor;
+        UIGraphicsBeginImageContext(size);
+        CGRect thumbnailRect = CGRectZero;
+        thumbnailRect.origin = thumbnailPoint;
+        thumbnailRect.size.width = scaledWidth;
+        thumbnailRect.size.height = scaledHeight;
+        
+        [sourceImage drawInRect:thumbnailRect];
+        
+        newImage = UIGraphicsGetImageFromCurrentImageContext();
+        if(newImage == nil){
+            NSLog(@"scale image fail");
         }
-        scaledWidth = width * scaleFactor;
-        scaledHeight = height * scaleFactor;
-        if(widthFactor > heightFactor){
-            thumbnailPoint.y = (targetHeight - scaledHeight) * 0.5;
-        }else if(widthFactor < heightFactor){
-            thumbnailPoint.x = (targetWidth - scaledWidth) * 0.5;
-        }
+        
+        UIGraphicsEndImageContext();
     }
-    UIGraphicsBeginImageContext(size);
-    CGRect thumbnailRect = CGRectZero;
-    thumbnailRect.origin = thumbnailPoint;
-    thumbnailRect.size.width = scaledWidth;
-    thumbnailRect.size.height = scaledHeight;
     
-    [sourceImage drawInRect:thumbnailRect];
-    
-    newImage = UIGraphicsGetImageFromCurrentImageContext();
-    if(newImage == nil){
-        NSLog(@"scale image fail");
-    }
-    
-    UIGraphicsEndImageContext();
     return newImage;
 }
 - (void)cancleAllTask{
@@ -189,6 +228,8 @@ dispatch_async(dispatch_get_main_queue(), block);\
 }
 - (void)dealloc{
     [self cancleAllTask];
+    [self removeTimer];
+
 }
 - (NSString *) stringFromMD5:(NSString *)str{
     
@@ -386,6 +427,8 @@ dispatch_async(dispatch_get_main_queue(), block);\
         [self.delegate MSScrollViewDidScroll:_scrollView];
     }
     [self playImages];
+
+    
 }
 - (void)playImages{
     if (self.direction == MSCycleDirectionHorizontal) {
@@ -443,7 +486,7 @@ dispatch_async(dispatch_get_main_queue(), block);\
 }
 - (void)addTimer{
     [self removeTimer];
-    self.AutoTimer = [NSTimer scheduledTimerWithTimeInterval:(_timeInterval>0?_timeInterval:2.5) target:self selector:@selector(autoShowNextImage) userInfo:nil repeats:YES];
+    self.AutoTimer = [NSTimer scheduledTimerWithTimeInterval:(_timeInterval>0?_timeInterval:2.5) target:[MSProxy proxyWithObjc:self] selector:@selector(autoShowNextImage) userInfo:nil repeats:YES];
     
     [[NSRunLoop mainRunLoop] addTimer:self.AutoTimer forMode:NSRunLoopCommonModes];
     
@@ -491,7 +534,17 @@ dispatch_async(dispatch_get_main_queue(), block);\
         
         _scrollView.contentOffset = CGPointMake(0, self.frame.size.height);
     }
-    
+    if ([self.delegate respondsToSelector:@selector(MSScrollViewDidScroll:didScrollPage:)]) {
+        if (self.direction == MSCycleDirectionHorizontal) {
+            if(fmodf(_scrollView.contentOffset.x, _scrollView.frame.size.width) == 0){
+                [self.delegate MSScrollViewDidScroll:self didScrollPage:_currentPage];
+            }
+        }else{
+            if(fmodf(_scrollView.contentOffset.y, _scrollView.frame.size.height) == 0){
+                [self.delegate MSScrollViewDidScroll:self didScrollPage:_currentPage];
+            }
+        }
+    }
     
 }
 #pragma mark 展示下一页

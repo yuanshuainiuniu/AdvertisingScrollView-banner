@@ -39,6 +39,7 @@ typedef NS_ENUM(NSInteger, MSPageControlDirection) {
  *
  */
 - (void)MSScrollViewDidScroll:(UIScrollView *)scrollView;
+- (void)MSScrollViewDidScroll:(MSScrollView *)scrollView didScrollPage:(NSInteger)index;
 @end
 
 @interface MSScrollView : UIView <UIScrollViewDelegate,UIGestureRecognizerDelegate>
